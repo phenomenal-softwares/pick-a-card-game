@@ -12,13 +12,21 @@ const GAP = 12;
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const CARD_SIZE = (SCREEN_WIDTH - GAP * 3) / 2;
 
-export default function CardGrid({ cards, isRevealed, onCardPick }) {
+export default function CardGrid({
+  cards,
+  isRevealed,
+  peekedCards = [],
+  onCardPick,
+}) {
+  const columns = cards.length <= 4 ? 2 : cards.length <= 6 ? 3 : 4;
+
   return (
     <View style={styles.grid}>
       {cards.map((card, index) => (
         <AnimatedCard
           key={card.id}
           index={index}
+          columns={columns}
           card={card}
           isRevealed={isRevealed}
           onCardPick={onCardPick}
@@ -31,28 +39,22 @@ export default function CardGrid({ cards, isRevealed, onCardPick }) {
 /* ------------------------------------
    Animated Card Wrapper
 -------------------------------------*/
-function AnimatedCard({ index, card, isRevealed, onCardPick }) {
+function AnimatedCard({ index, columns, card, isRevealed, onCardPick }) {
   const x = useSharedValue(0);
   const y = useSharedValue(0);
 
+  const CARD_SIZE = 80; // safe MVP size
+
   useEffect(() => {
-    const row = Math.floor(index / 2);
-    const col = index % 2;
+    const row = Math.floor(index / columns);
+    const col = index % columns;
 
-    x.value = withTiming(col * (CARD_SIZE + GAP), {
-      duration: 600,
-    });
-
-    y.value = withTiming(row * (CARD_SIZE + GAP), {
-      duration: 600,
-    });
-  }, [index]);
+    x.value = withTiming(col * (CARD_SIZE + GAP), { duration: 600 });
+    y.value = withTiming(row * (CARD_SIZE + GAP), { duration: 600 });
+  }, [index, columns]);
 
   const style = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: x.value },
-      { translateY: y.value },
-    ],
+    transform: [{ translateX: x.value }, { translateY: y.value }],
   }));
 
   return (
@@ -60,6 +62,7 @@ function AnimatedCard({ index, card, isRevealed, onCardPick }) {
       <Card
         card={card}
         isRevealed={isRevealed}
+        isPeeked={peekedCards.includes(card.id)}
         onPick={onCardPick}
       />
     </Animated.View>

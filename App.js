@@ -1,41 +1,70 @@
-import "react-native-gesture-handler";
-import { useEffect } from "react";
-import { View, StyleSheet, Platform, StatusBar } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 
-import GameScreen from "./src/screens/GameScreen";
+import MenuScreen from "./src/screens/MenuScreen";
+import GameScreen from "./src/screens/GameScreen/GameScreen";
+
+import {
+  loadUserData,
+  updateHighScore,
+} from "./src/utils/storage";
 
 export default function App() {
+  const [userData, setUserData] = useState(null);
+  const [screen, setScreen] = useState("MENU"); // MENU | GAME
+  const [loading, setLoading] = useState(true);
+
+  // Load user data once on app start
   useEffect(() => {
-    if (Platform.OS === "web") {
-      document.body.style.backgroundColor = "#0f172a";
-    }
+    const init = async () => {
+      const data = await loadUserData();
+      setUserData(data);
+      setLoading(false);
+    };
+
+    init();
   }, []);
 
+  // Called when game ends and score is finalized
+  const handleGameOver = async (finalScore) => {
+    const updatedUser = await updateHighScore(userData, finalScore);
+    setUserData(updatedUser);
+  };
+
+  if (loading || !userData) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#4caf50" />
+      </View>
+    );
+  }
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.safeArea}>
-          <StatusBar barStyle="light-content" />
-          <View style={styles.container}>
-            <GameScreen />
-          </View>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <>
+      {screen === "MENU" && (
+        <MenuScreen
+          userData={userData}
+          setUserData={setUserData}
+          onStartGame={() => setScreen("GAME")}
+        />
+      )}
+
+      {screen === "GAME" && (
+        <GameScreen
+          difficulty={userData.difficulty}
+          highScore={userData.highScore}
+          onGameOver={handleGameOver}
+          onBackToMenu={() => setScreen("MENU")}
+        />
+      )}
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  loader: {
     flex: 1,
-    backgroundColor: "#0f172a",
-  },
-
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#0e0e10",
     alignItems: "center",
     justifyContent: "center",
   },

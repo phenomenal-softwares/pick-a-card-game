@@ -9,15 +9,22 @@ import { useEffect } from "react";
 
 import styles from "./Card.styles";
 
-export default function Card({ card, isRevealed, onPick }) {
+export default function Card({
+  card,
+  isRevealed,
+  isPeeked = false,
+  onPick,
+}) {
   // 0 = face down, 1 = face up
   const flip = useSharedValue(0);
 
+  const shouldShowBack = isRevealed || isPeeked;
+
   useEffect(() => {
-    flip.value = withTiming(isRevealed ? 1 : 0, {
-      duration: 500,
+    flip.value = withTiming(shouldShowBack ? 1 : 0, {
+      duration: 400,
     });
-  }, [isRevealed]);
+  }, [shouldShowBack]);
 
   const frontStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(flip.value, [0, 1], [0, 180]);
@@ -37,12 +44,20 @@ export default function Card({ card, isRevealed, onPick }) {
 
   return (
     <Pressable
-      disabled={isRevealed}
+      disabled={isRevealed || isPeeked}
       onPress={() => onPick(card)}
       style={styles.wrapper}
     >
-      <Animated.View style={[styles.card, styles.front, frontStyle]} />
+      {/* Front (cover) */}
+      <Animated.View
+        style={[
+          styles.card,
+          styles.front,
+          frontStyle,
+        ]}
+      />
 
+      {/* Back (content) */}
       <Animated.View
         style={[
           styles.card,
