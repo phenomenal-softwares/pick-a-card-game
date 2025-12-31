@@ -27,6 +27,7 @@ export default function App() {
 
   // Called when game ends and score is finalized
   const handleGameOver = async (finalScore) => {
+    alert("Game Over! Your score: " + finalScore);
     const updatedUser = await updateHighScore(userData, finalScore);
     setUserData(updatedUser);
   };

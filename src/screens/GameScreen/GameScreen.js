@@ -35,6 +35,7 @@ export default function GameScreen({
   const [powerup, setPowerup] = useState(null);
   const [powerupUses, setPowerupUses] = useState(0);
   const [peekedCards, setPeekedCards] = useState([]);
+  const [freezeActive, setFreezeActive] = useState(false);
 
   /* ----------------------------
      INITIAL LOAD
@@ -105,7 +106,8 @@ export default function GameScreen({
      POWERUP USAGE
   -----------------------------*/
   const usePowerup = () => {
-    if (!powerup || powerupUses <= 0 || isRevealed) return;
+    if (!powerup || powerupUses <= 0 || isRevealed || peekedCards.length > 0)
+      return;
 
     let peekCount = 0;
 
@@ -113,7 +115,10 @@ export default function GameScreen({
     if (powerup.id === "double_peek") peekCount = 2;
 
     if (peekCount > 0) {
-      const candidates = cards.filter((c) => c.id !== targetCard.id);
+      const candidates = cards.filter(
+        (c) =>
+          c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
+      );
 
       const shuffled = shuffleArray([...candidates]);
       const selected = shuffled.slice(0, peekCount);
@@ -128,9 +133,36 @@ export default function GameScreen({
     }
 
     if (powerup.id === "freeze_shuffle") {
-      // placeholder — effect will be applied in startRound later
+      setFreezeActive(true);
       setPowerupUses((prev) => prev - 1);
+
+      // Auto-disable after effect window
+      setTimeout(() => {
+        setFreezeActive(false);
+      }, 3000);
     }
+  };
+
+  const handlePowerupPress = () => {
+    if (!powerup) {
+      setFeedback("No powerup selected");
+      setFeedbackType("info");
+      setTimeout(() => {
+        setFeedback("");
+      }, 2000);
+      return;
+    }
+
+    if (powerupUses <= 0) {
+      setFeedback("Powerup exhausted");
+      setFeedbackType("error");
+      setTimeout(() => {
+        setFeedback("");
+      }, 2000);
+      return;
+    }
+
+    usePowerup();
   };
 
   /* ----------------------------
@@ -153,9 +185,10 @@ export default function GameScreen({
       {/* POWERUP SELECTION */}
       {showPowerupModal && (
         <PowerupModal
-          onComplete={(chosenPowerup, uses) => {
-            setPowerup(chosenPowerup);
-            setPowerupUses(uses);
+          visible={showPowerupModal}
+          onComplete={({ powerup, count }) => {
+            setPowerup(powerup);
+            setPowerupUses(count);
             setShowPowerupModal(false);
           }}
         />
@@ -179,11 +212,20 @@ export default function GameScreen({
       </Text>
 
       {/* POWERUP BUTTON */}
-      {powerup && powerupUses > 0 && (
-        <Text style={styles.powerupButton} onPress={usePowerup}>
-          🧪 {powerup.label} ({powerupUses})
-        </Text>
-      )}
+      <Text
+        style={[
+          styles.powerupButton,
+          (!powerup || powerupUses <= 0) && styles.powerupButtonDisabled,
+          freezeActive && styles.powerupButtonActive,
+        ]}
+        onPress={handlePowerupPress}
+      >
+        {powerup
+          ? powerupUses > 0
+            ? `🧪 ${powerup.label} (${powerupUses})`
+            : `🧪 ${powerup.label} (empty)`
+          : "🧪 No Powerup"}
+      </Text>
 
       {/* TARGET */}
       {targetCard && (
@@ -195,6 +237,7 @@ export default function GameScreen({
         cards={cards}
         isRevealed={isRevealed}
         peekedCards={peekedCards}
+        freezeActive={freezeActive}
         onCardPick={handleCardPick}
       />
 

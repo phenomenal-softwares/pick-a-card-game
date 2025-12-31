@@ -16,6 +16,7 @@ export default function CardGrid({
   cards,
   isRevealed,
   peekedCards = [],
+  freezeActive = false,
   onCardPick,
 }) {
   const columns = cards.length <= 4 ? 2 : cards.length <= 6 ? 3 : 4;
@@ -29,6 +30,8 @@ export default function CardGrid({
           columns={columns}
           card={card}
           isRevealed={isRevealed}
+          peekedCards={peekedCards}
+          freezeActive={freezeActive}
           onCardPick={onCardPick}
         />
       ))}
@@ -39,19 +42,20 @@ export default function CardGrid({
 /* ------------------------------------
    Animated Card Wrapper
 -------------------------------------*/
-function AnimatedCard({ index, columns, card, isRevealed, onCardPick }) {
+function AnimatedCard({ index, columns, card, isRevealed,peekedCards, freezeActive, onCardPick  }) {
   const x = useSharedValue(0);
   const y = useSharedValue(0);
 
   const CARD_SIZE = 80; // safe MVP size
+  const duration = freezeActive ? 1400 : 600;
 
   useEffect(() => {
     const row = Math.floor(index / columns);
     const col = index % columns;
 
-    x.value = withTiming(col * (CARD_SIZE + GAP), { duration: 600 });
-    y.value = withTiming(row * (CARD_SIZE + GAP), { duration: 600 });
-  }, [index, columns]);
+    x.value = withTiming(col * (CARD_SIZE + GAP), { duration });
+    y.value = withTiming(row * (CARD_SIZE + GAP), { duration });
+  }, [index, columns, freezeActive]);
 
   const style = useAnimatedStyle(() => ({
     transform: [{ translateX: x.value }, { translateY: y.value }],
@@ -63,6 +67,7 @@ function AnimatedCard({ index, columns, card, isRevealed, onCardPick }) {
         card={card}
         isRevealed={isRevealed}
         isPeeked={peekedCards.includes(card.id)}
+          freezeActive={freezeActive}
         onPick={onCardPick}
       />
     </Animated.View>

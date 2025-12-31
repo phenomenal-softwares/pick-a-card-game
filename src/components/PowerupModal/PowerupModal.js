@@ -1,24 +1,27 @@
 import { useState, useEffect } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { POWERUPS } from "../../data/powerups";
+import { shuffleArray } from "../../utils/shuffle";
 import styles from "./PowerupModal.styles";
-
-const POWERUPS = [
-  { id: "peek", label: "Peek" },
-  { id: "double_peek", label: "Double Peek" },
-  { id: "freeze_shuffle", label: "Freeze Shuffle" },
-];
 
 const COUNTERS = [1, 2, 5];
 
 export default function PowerupModal({ visible, onComplete }) {
   const [selectedPowerup, setSelectedPowerup] = useState(null);
   const [selectedCount, setSelectedCount] = useState(null);
+  const [shuffledPowerups, setShuffledPowerups] = useState([]);
+  const [shuffledCounters, setShuffledCounters] = useState([]);
   const [stage, setStage] = useState("powerup"); // powerup | counter
+
+  useEffect(() => {
+    if (visible) {
+      setShuffledPowerups(shuffleArray([...POWERUPS]));
+      setShuffledCounters(shuffleArray([...COUNTERS]));
+      setSelectedPowerup(null);
+      setSelectedCount(null);
+      setStage("powerup");
+    }
+  }, [visible]);
 
   useEffect(() => {
     if (selectedPowerup && selectedCount) {
@@ -49,23 +52,17 @@ export default function PowerupModal({ visible, onComplete }) {
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.container}>
-
-          <Text style={styles.title}>
-            Pick a Powerup
-          </Text>
+          <Text style={styles.title}>Pick a Powerup</Text>
 
           {/* Powerup Cards */}
           <View style={styles.cardRow}>
-            {POWERUPS.map((item) => {
+            {shuffledPowerups.map((item) => {
               const opened = selectedPowerup?.id === item.id;
 
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[
-                    styles.card,
-                    opened && styles.cardOpen,
-                  ]}
+                  style={[styles.card, opened && styles.cardOpen]}
                   onPress={() => handlePowerupPick(item)}
                   disabled={!!selectedPowerup}
                 >
@@ -78,12 +75,10 @@ export default function PowerupModal({ visible, onComplete }) {
           </View>
 
           {/* Counter Section */}
-          <Text style={styles.subtitle}>
-            Powerup Uses
-          </Text>
+          <Text style={styles.subtitle}>Powerup Uses</Text>
 
           <View style={styles.cardRow}>
-            {COUNTERS.map((count) => {
+            {shuffledCounters.map((count) => {
               const opened = selectedCount === count;
 
               return (
@@ -104,7 +99,6 @@ export default function PowerupModal({ visible, onComplete }) {
               );
             })}
           </View>
-
         </View>
       </View>
     </Modal>

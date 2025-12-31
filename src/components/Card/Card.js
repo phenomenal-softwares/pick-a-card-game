@@ -13,18 +13,19 @@ export default function Card({
   card,
   isRevealed,
   isPeeked = false,
+  freezeActive = false,
   onPick,
 }) {
   // 0 = face down, 1 = face up
   const flip = useSharedValue(0);
 
-  const shouldShowBack = isRevealed || isPeeked;
+  const shouldShowBack = isRevealed || isPeeked || freezeActive;
 
   useEffect(() => {
     flip.value = withTiming(shouldShowBack ? 1 : 0, {
       duration: 400,
     });
-  }, [shouldShowBack]);
+  }, [shouldShowBack, freezeActive]);
 
   const frontStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(flip.value, [0, 1], [0, 180]);
@@ -44,18 +45,12 @@ export default function Card({
 
   return (
     <Pressable
-      disabled={isRevealed || isPeeked}
+      disabled={isRevealed || isPeeked || freezeActive}
       onPress={() => onPick(card)}
       style={styles.wrapper}
     >
       {/* Front (cover) */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.front,
-          frontStyle,
-        ]}
-      />
+      <Animated.View style={[styles.card, styles.front, frontStyle]} />
 
       {/* Back (content) */}
       <Animated.View

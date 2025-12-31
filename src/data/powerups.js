@@ -14,7 +14,7 @@ export const POWERUPS = [
     rarity: "rare",
   },
   {
-    id: "shuffle_freeze",
+    id: "freeze_shuffle",
     label: "Shuffle Freeze",
     description: "Slow down the shuffle animation.",
     maxTargets: 0, // no card reveal

@@ -52,11 +52,26 @@ export default StyleSheet.create({
   },
 
   powerupButton: {
-  fontSize: 14,
-  fontWeight: "700",
-  color: "#22c55e",
-  marginTop: 6,
-},
+    marginTop: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#fef3c7",
+    backgroundColor: "#7c3aed",
+    opacity: 1,
+  },
+
+  powerupButtonActive: {
+    backgroundColor: "#2563eb",
+  },
+
+  powerupButtonDisabled: {
+    backgroundColor: "#374151",
+    color: "#9ca3af",
+    opacity: 0.6,
+  },
 
   targetText: {
     fontSize: 22,
