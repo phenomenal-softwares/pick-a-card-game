@@ -3,7 +3,10 @@ import { View, Text } from "react-native";
 
 import CardGrid from "../../components/CardGrid/CardGrid";
 import Feedback from "../../components/Feedback/Feedback";
+
 import PowerupModal from "../../components/PowerupModal/PowerupModal";
+import GameOverModal from "../../components/GameOverModal/GameOverModal";
+import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 
 import { CARD_POOLS } from "../../data/cards";
 import { shuffleArray } from "../../utils/shuffle";
@@ -21,6 +24,7 @@ export default function GameScreen({
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
 
+  /* ---------- CARDS ---------- */
   const [cards, setCards] = useState([]);
   const [targetCard, setTargetCard] = useState(null);
 
@@ -36,6 +40,13 @@ export default function GameScreen({
   const [powerupUses, setPowerupUses] = useState(0);
   const [peekedCards, setPeekedCards] = useState([]);
   const [freezeActive, setFreezeActive] = useState(false);
+
+  /* --- GAME OVER MODAL --- */
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
+
+  /* --- CONFIRM MODAL --- */
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   /* ----------------------------
      INITIAL LOAD
@@ -170,7 +181,11 @@ export default function GameScreen({
   -----------------------------*/
   const finalizeGame = (finalScore) => {
     onGameOver(finalScore);
+    setFinalScore(finalScore);
+    setShowGameOverModal(true);
+  };
 
+  const restartGame = () => {
     // reset local state
     setRound(1);
     setScore(0);
@@ -178,7 +193,7 @@ export default function GameScreen({
     setPowerupUses(0);
     setShowPowerupModal(true);
     setPeekedCards([]);
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -206,8 +221,7 @@ export default function GameScreen({
         </View>
       </View>
 
-      {/* MENU */}
-      <Text style={styles.menuButton} onPress={onBackToMenu}>
+      <Text style={styles.menuButton} onPress={() => setShowExitConfirm(true)}>
         ☰ Menu
       </Text>
 
@@ -250,6 +264,35 @@ export default function GameScreen({
 
       {/* SCORE */}
       <Text style={styles.score}>Score: {score}</Text>
+
+      {/* GAME OVER MODAL */}
+      <GameOverModal
+        visible={showGameOverModal}
+        score={finalScore}
+        highScore={highScore}
+        onRestart={() => {
+          setShowGameOverModal(false);
+          restartGame();
+        }}
+        onExit={() => {
+          setShowGameOverModal(false);
+          onBackToMenu();
+        }}
+      />
+
+      {/* EXIT CONFIRMATION */}
+      <ConfirmModal
+        visible={showExitConfirm}
+        title="Exit Game?"
+        message="Your current progress will be lost. Are you sure you want to return to the menu?"
+        confirmText="Exit"
+        cancelText="Stay"
+        onCancel={() => setShowExitConfirm(false)}
+        onConfirm={() => {
+          setShowExitConfirm(false);
+          onBackToMenu();
+        }}
+      />
     </View>
   );
 }
