@@ -120,34 +120,55 @@ export default function GameScreen({
     if (!powerup || powerupUses <= 0 || isRevealed || peekedCards.length > 0)
       return;
 
-    let peekCount = 0;
+    // --------------------
+    // STANDARD PEEKS
+    // --------------------
+    if (powerup.id === "peek" || powerup.id === "double_peek") {
+      const peekCount = powerup.id === "peek" ? 1 : 2;
 
-    if (powerup.id === "peek") peekCount = 1;
-    if (powerup.id === "double_peek") peekCount = 2;
-
-    if (peekCount > 0) {
       const candidates = cards.filter(
         (c) =>
           c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
       );
 
-      const shuffled = shuffleArray([...candidates]);
-      const selected = shuffled.slice(0, peekCount);
+      const selected = shuffleArray([...candidates]).slice(0, peekCount);
 
       setPeekedCards(selected.map((c) => c.id));
       setPowerupUses((prev) => prev - 1);
 
-      // hide again after delay
-      setTimeout(() => {
-        setPeekedCards([]);
-      }, 1200);
+      setTimeout(() => setPeekedCards([]), 1200);
+      return;
     }
 
-    if (powerup.id === "freeze_shuffle") {
+    // --------------------
+    // TRUE SIGHT (TARGET + ONE DECOY)
+    // --------------------
+    if (powerup.id === "true_sight") {
+      const decoyCandidates = cards.filter(
+        (c) => c.id !== targetCard.id && !c.isMatched
+      );
+
+      if (decoyCandidates.length === 0) return;
+
+      const decoy = shuffleArray([...decoyCandidates])[0];
+
+      setPeekedCards([targetCard.id, decoy.id]);
+      setPowerupUses((prev) => prev - 1);
+
+      setTimeout(() => {
+        setPeekedCards([]);
+      }, 1400); // slightly longer for impact
+
+      return;
+    }
+
+    // --------------------
+    // BIG SHOW
+    // --------------------
+    if (powerup.id === "big_show") {
       setFreezeActive(true);
       setPowerupUses((prev) => prev - 1);
 
-      // Auto-disable after effect window
       setTimeout(() => {
         setFreezeActive(false);
       }, 3000);
@@ -193,7 +214,7 @@ export default function GameScreen({
     setPowerupUses(0);
     setShowPowerupModal(true);
     setPeekedCards([]);
-  }
+  };
 
   return (
     <View style={styles.container}>

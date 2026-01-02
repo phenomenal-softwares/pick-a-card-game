@@ -1,18 +1,19 @@
+import { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { updateDifficulty } from "../utils/storage";
+import ConfirmModal from "../components/ConfirmModal/ConfirmModal";
 
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"];
 
-export default function MenuScreen({
-  userData,
-  setUserData,
-  onStartGame,
-}) {
-  const handleDifficultyChange = async (level) => {
+export default function MenuScreen({ userData, setUserData, onStartGame }) {
+  const [showDiffConfirm, setShowDiffConfirm] = useState(false);
+  const [pendingDifficulty, setPendingDifficulty] = useState(null);
+
+  const handleDifficultyChange = (level) => {
     if (level === userData.difficulty) return;
 
-    const updatedUser = await updateDifficulty(userData, level);
-    setUserData(updatedUser);
+    setPendingDifficulty(level);
+    setShowDiffConfirm(true);
   };
 
   return (
@@ -28,18 +29,10 @@ export default function MenuScreen({
           return (
             <TouchableOpacity
               key={level}
-              style={[
-                styles.diffButton,
-                active && styles.diffButtonActive,
-              ]}
+              style={[styles.diffButton, active && styles.diffButtonActive]}
               onPress={() => handleDifficultyChange(level)}
             >
-              <Text
-                style={[
-                  styles.diffText,
-                  active && styles.diffTextActive,
-                ]}
-              >
+              <Text style={[styles.diffText, active && styles.diffTextActive]}>
                 {level}
               </Text>
             </TouchableOpacity>
@@ -49,18 +42,36 @@ export default function MenuScreen({
 
       {/* High Score */}
       <View style={styles.section}>
-        <Text style={styles.highScore}>
-          High Score: {userData.highScore}
-        </Text>
+        <Text style={styles.highScore}>High Score: {userData.highScore}</Text>
       </View>
 
       {/* Play Button */}
-      <TouchableOpacity
-        style={styles.playButton}
-        onPress={onStartGame}
-      >
+      <TouchableOpacity style={styles.playButton} onPress={onStartGame}>
         <Text style={styles.playText}>PLAY GAME</Text>
       </TouchableOpacity>
+
+      {/* Confirm Difficulty Change Modal */}
+      <ConfirmModal
+        visible={showDiffConfirm}
+        title="Change Difficulty?"
+        message="Changing difficulty will reset your highest score for this mode. This action cannot be undone."
+        confirmText="Change"
+        cancelText="Cancel"
+        onCancel={() => {
+          setShowDiffConfirm(false);
+          setPendingDifficulty(null);
+        }}
+        onConfirm={async () => {
+          setShowDiffConfirm(false);
+
+          if (!pendingDifficulty) return;
+
+          const updatedUser = await updateDifficulty(userData, pendingDifficulty);
+          setUserData(updatedUser);
+
+          setPendingDifficulty(null);
+        }}
+      />
     </View>
   );
 }

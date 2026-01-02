@@ -33,7 +33,10 @@ export default StyleSheet.create({
 
   cardRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
   },
 
   card: {

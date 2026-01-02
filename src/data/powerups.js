@@ -14,10 +14,17 @@ export const POWERUPS = [
     rarity: "rare",
   },
   {
-    id: "freeze_shuffle",
-    label: "Shuffle Freeze",
-    description: "Slow down the shuffle animation.",
+    id: "big_show",
+    label: "Big Show",
+    description: "Reveal all cards for a longer moment.",
     maxTargets: 0, // no card reveal
+    rarity: "epic",
+  },
+  {
+    id: "true_sight",
+    label: "True Sight",
+    description: "Reveal the target card and one decoy briefly.",
+    maxTargets: 2,
     rarity: "epic",
   },
 ];
