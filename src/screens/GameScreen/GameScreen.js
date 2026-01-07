@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 
 import CardGrid from "../../components/CardGrid/CardGrid";
 import Feedback from "../../components/Feedback/Feedback";
@@ -10,6 +10,9 @@ import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 
 import { CARD_POOLS } from "../../data/cards";
 import { shuffleArray } from "../../utils/shuffle";
+
+import { useNavigation } from "@react-navigation/native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 import styles from "./GameScreen.styles";
 
@@ -23,6 +26,8 @@ export default function GameScreen({
 }) {
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
+
+  const navigation = useNavigation();
 
   /* ---------- CARDS ---------- */
   const [cards, setCards] = useState([]);
@@ -240,11 +245,13 @@ export default function GameScreen({
             Round {round} / {TOTAL_ROUNDS}
           </Text>
         </View>
+        <TouchableOpacity
+          onPress={() => setShowExitConfirm(true)}
+          style={styles.menuButton}
+        >
+          <Ionicons size={28} color="#e5e7eb" name="menu" />
+        </TouchableOpacity>
       </View>
-
-      <Text style={styles.menuButton} onPress={() => setShowExitConfirm(true)}>
-        ☰ Menu
-      </Text>
 
       {/* POWERUP BUTTON */}
       <Text
@@ -309,10 +316,7 @@ export default function GameScreen({
         confirmText="Exit"
         cancelText="Stay"
         onCancel={() => setShowExitConfirm(false)}
-        onConfirm={() => {
-          setShowExitConfirm(false);
-          onBackToMenu();
-        }}
+        onConfirm={() => navigation.replace("MainMenu")}
       />
     </View>
   );

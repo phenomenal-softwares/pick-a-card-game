@@ -40,8 +40,8 @@ export default StyleSheet.create({
   },
 
   card: {
-    width: 90,
-    height: 110,
+    width: 60,
+    height: 90,
     backgroundColor: "#1c2d4a",
     borderRadius: 12,
     justifyContent: "center",

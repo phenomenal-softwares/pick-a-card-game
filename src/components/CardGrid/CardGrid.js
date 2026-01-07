@@ -8,9 +8,8 @@ import Animated, {
 
 import Card from "../Card/Card";
 
-const GAP = 12;
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const CARD_SIZE = (SCREEN_WIDTH - GAP * 3) / 2;
+const CARD_SIZE = 126; // solid, readable
+const GAP = -20;      // tight but breathable
 
 export default function CardGrid({
   cards,
@@ -19,10 +18,26 @@ export default function CardGrid({
   freezeActive = false,
   onCardPick,
 }) {
-  const columns = cards.length <= 4 ? 2 : cards.length <= 6 ? 3 : 4;
+  const cardCount = cards.length;
+
+  const columns = cardCount <= 4 ? 2 : 3;
+  const rows = Math.ceil(cardCount / columns);
+
+  const gridWidth =
+    columns * CARD_SIZE + (columns - 1) * GAP;
+  const gridHeight =
+    rows * CARD_SIZE + (rows - 1) * GAP;
 
   return (
-    <View style={styles.grid}>
+    <View
+      style={[
+        styles.grid,
+        {
+          width: gridWidth,
+          height: gridHeight,
+        },
+      ]}
+    >
       {cards.map((card, index) => (
         <AnimatedCard
           key={card.id}
@@ -42,11 +57,18 @@ export default function CardGrid({
 /* ------------------------------------
    Animated Card Wrapper
 -------------------------------------*/
-function AnimatedCard({ index, columns, card, isRevealed,peekedCards, freezeActive, onCardPick  }) {
+function AnimatedCard({
+  index,
+  columns,
+  card,
+  isRevealed,
+  peekedCards,
+  freezeActive,
+  onCardPick,
+}) {
   const x = useSharedValue(0);
   const y = useSharedValue(0);
 
-  const CARD_SIZE = 80; // safe MVP size
   const duration = freezeActive ? 1400 : 600;
 
   useEffect(() => {
@@ -58,16 +80,28 @@ function AnimatedCard({ index, columns, card, isRevealed,peekedCards, freezeActi
   }, [index, columns, freezeActive]);
 
   const style = useAnimatedStyle(() => ({
-    transform: [{ translateX: x.value }, { translateY: y.value }],
+    transform: [
+      { translateX: x.value },
+      { translateY: y.value },
+    ],
   }));
 
   return (
-    <Animated.View style={[styles.cardWrapper, style]}>
+    <Animated.View
+      style={[
+        styles.cardWrapper,
+        {
+          width: CARD_SIZE,
+          height: CARD_SIZE,
+        },
+        style,
+      ]}
+    >
       <Card
         card={card}
         isRevealed={isRevealed}
         isPeeked={peekedCards.includes(card.id)}
-          freezeActive={freezeActive}
+        freezeActive={freezeActive}
         onPick={onCardPick}
       />
     </Animated.View>
@@ -76,15 +110,14 @@ function AnimatedCard({ index, columns, card, isRevealed,peekedCards, freezeActi
 
 const styles = StyleSheet.create({
   grid: {
-    width: CARD_SIZE * 2 + GAP,
-    height: CARD_SIZE * 2 + GAP,
     position: "relative",
-    marginVertical: 20,
+    alignSelf: "center",
+    marginVertical: 16,
   },
-
   cardWrapper: {
     position: "absolute",
-    width: CARD_SIZE,
-    height: CARD_SIZE,
+    alignItems: "center",
+    justifyContent: "flex-start",
   },
 });
+
