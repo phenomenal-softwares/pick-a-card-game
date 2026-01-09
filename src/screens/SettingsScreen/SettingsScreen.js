@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { updateDifficulty } from "../../utils/storage";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import AppHeader from "../../components/AppHeader/AppHeader";
 import { useNavigation } from "@react-navigation/native";
 
+import { useUser } from "../../context/userContext";
 import styles from "./SettingsScreen.styles";
 
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"];
 
-export default function SettingsScreen({ userData, setUserData }) {
+export default function SettingsScreen() {
+  const { user, changeDifficulty, hardReset } = useUser();
   const navigation = useNavigation();
 
   const [showDiffConfirm, setShowDiffConfirm] = useState(false);
@@ -18,10 +19,27 @@ export default function SettingsScreen({ userData, setUserData }) {
   const [soundsEnabled, setSoundsEnabled] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  if (!user) return null; // Wait until context loads
+
+  /* ---------- HANDLE DIFFICULTY ---------- */
   const handleDifficultyChange = (level) => {
-    if (level === userData.difficulty) return;
+    if (level === user.difficulty) return;
     setPendingDifficulty(level);
     setShowDiffConfirm(true);
+  };
+
+  const confirmDifficultyChange = async () => {
+    setShowDiffConfirm(false);
+    if (!pendingDifficulty) return;
+
+    await changeDifficulty(pendingDifficulty); // ✅ context function
+    setPendingDifficulty(null);
+  };
+
+  /* ---------- HANDLE DELETE DATA ---------- */
+  const confirmDeleteData = async () => {
+    setShowDeleteConfirm(false);
+    await hardReset(); // ✅ context function resets storage & state
   };
 
   return (
@@ -32,26 +50,16 @@ export default function SettingsScreen({ userData, setUserData }) {
         {/* DIFFICULTY */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Difficulty</Text>
-
           <View style={styles.row}>
             {DIFFICULTIES.map((level) => {
-              const active = level === userData.difficulty;
-
+              const active = level === user.difficulty;
               return (
                 <TouchableOpacity
                   key={level}
-                  style={[
-                    styles.optionButton,
-                    active && styles.optionButtonActive,
-                  ]}
+                  style={[styles.optionButton, active && styles.optionButtonActive]}
                   onPress={() => handleDifficultyChange(level)}
                 >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      active && styles.optionTextActive,
-                    ]}
-                  >
+                  <Text style={[styles.optionText, active && styles.optionTextActive]}>
                     {level}
                   </Text>
                 </TouchableOpacity>
@@ -60,41 +68,24 @@ export default function SettingsScreen({ userData, setUserData }) {
           </View>
         </View>
 
-        {/* SOUNDS */}
+        {/* GAME SOUNDS */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Game Sounds</Text>
-
           <View style={styles.row}>
             <TouchableOpacity
-              style={[
-                styles.optionButton,
-                soundsEnabled && styles.optionButtonActive,
-              ]}
+              style={[styles.optionButton, soundsEnabled && styles.optionButtonActive]}
               onPress={() => setSoundsEnabled(true)}
             >
-              <Text
-                style={[
-                  styles.optionText,
-                  soundsEnabled && styles.optionTextActive,
-                ]}
-              >
+              <Text style={[styles.optionText, soundsEnabled && styles.optionTextActive]}>
                 ON
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.optionButton,
-                !soundsEnabled && styles.optionButtonActive,
-              ]}
+              style={[styles.optionButton, !soundsEnabled && styles.optionButtonActive]}
               onPress={() => setSoundsEnabled(false)}
             >
-              <Text
-                style={[
-                  styles.optionText,
-                  !soundsEnabled && styles.optionTextActive,
-                ]}
-              >
+              <Text style={[styles.optionText, !soundsEnabled && styles.optionTextActive]}>
                 OFF
               </Text>
             </TouchableOpacity>
@@ -112,7 +103,7 @@ export default function SettingsScreen({ userData, setUserData }) {
         </View>
       </View>
 
-      {/* CONFIRM DIFFICULTY */}
+      {/* CONFIRM DIFFICULTY CHANGE */}
       <ConfirmModal
         visible={showDiffConfirm}
         title="Change Difficulty?"
@@ -123,18 +114,7 @@ export default function SettingsScreen({ userData, setUserData }) {
           setShowDiffConfirm(false);
           setPendingDifficulty(null);
         }}
-        onConfirm={async () => {
-          setShowDiffConfirm(false);
-
-          if (!pendingDifficulty) return;
-
-          const updatedUser = await updateDifficulty(
-            userData,
-            pendingDifficulty
-          );
-          setUserData(updatedUser);
-          setPendingDifficulty(null);
-        }}
+        onConfirm={confirmDifficultyChange}
       />
 
       {/* CONFIRM DELETE */}
@@ -146,10 +126,7 @@ export default function SettingsScreen({ userData, setUserData }) {
         cancelText="Cancel"
         destructive
         onCancel={() => setShowDeleteConfirm(false)}
-        onConfirm={() => {
-          // Hook real delete logic later
-          setShowDeleteConfirm(false);
-        }}
+        onConfirm={confirmDeleteData}
       />
     </>
   );

@@ -1,3 +1,4 @@
+import { startTransition, use } from "react";
 import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
@@ -8,11 +9,23 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     padding: 20,
   },
+  header: {
+    alignItems: "center",
+    marginTop: 60,
+  },
   title: {
     fontSize: 36,
     fontWeight: "bold",
     color: "#fff",
     marginBottom: 40,
+  },
+  userStats: {
+    marginTop: 20,
+  },
+  statText: {
+    color: "#fff",
+    fontSize: 18,
+    marginVertical: 4,
   },
   buttonContainer: {
     width: "100%",

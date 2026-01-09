@@ -4,26 +4,66 @@ const STORAGE_KEY = "PICK_A_CARD_USER";
 
 const DEFAULT_USER_DATA = {
   difficulty: "EASY",
-  highScore: 0,
+
+  highScores: {
+    EASY: 0,
+    MEDIUM: 0,
+    HARD: 0,
+  },
+
+  coins: 0,
+
   stats: {
     gamesPlayed: 0,
+    gamesWon: 0,
     totalCorrect: 0,
     totalWrong: 0,
   },
+
   achievements: [],
+  claimedAchievements: [], // claimed achievement IDs
 };
 
-/**
- * Load user data from storage
- */
+/* ----------------------------------
+   LOAD USER DATA (WITH MIGRATION)
+----------------------------------- */
 export const loadUserData = async () => {
   try {
     const stored = await AsyncStorage.getItem(STORAGE_KEY);
+
     if (stored) {
-      return JSON.parse(stored);
+      const parsed = JSON.parse(stored);
+
+      // 🔄 Migration: old single highScore → per-difficulty
+      if (!parsed.highScores) {
+        parsed.highScores = {
+          EASY: parsed.highScore || 0,
+          MEDIUM: 0,
+          HARD: 0,
+        };
+        delete parsed.highScore;
+      }
+
+      // Ensure coins
+      if (parsed.coins == null) parsed.coins = 0;
+
+      // Ensure stats integrity
+      parsed.stats = {
+        gamesPlayed: parsed.stats?.gamesPlayed ?? 0,
+        gamesWon: parsed.stats?.gamesWon ?? 0,
+        totalCorrect: parsed.stats?.totalCorrect ?? 0,
+        totalWrong: parsed.stats?.totalWrong ?? 0,
+      };
+
+      // Ensure achievements
+      if (!Array.isArray(parsed.achievements)) {
+        parsed.achievements = [];
+      }
+
+      await saveUserData(parsed);
+      return parsed;
     }
 
-    // First launch
     await AsyncStorage.setItem(
       STORAGE_KEY,
       JSON.stringify(DEFAULT_USER_DATA)
@@ -35,9 +75,9 @@ export const loadUserData = async () => {
   }
 };
 
-/**
- * Save full user object
- */
+/* ----------------------------------
+   SAVE USER DATA
+----------------------------------- */
 export const saveUserData = async (userData) => {
   try {
     await AsyncStorage.setItem(
@@ -49,38 +89,100 @@ export const saveUserData = async (userData) => {
   }
 };
 
-/**
- * Update difficulty and reset high score
- */
+/* ----------------------------------
+   PROCESS GAME RESULT (CORE ENGINE)
+----------------------------------- */
+export const processGameResult = async (userData, result) => {
+  const { score, correct, wrong, difficulty, won } = result;
+
+  const updatedUser = {
+    ...userData,
+    stats: { ...userData.stats },
+    highScores: { ...userData.highScores },
+    achievements: [...userData.achievements],
+  };
+
+  // --------------------
+  // STATS
+  // --------------------
+  updatedUser.stats.gamesPlayed += 1;
+  updatedUser.stats.totalCorrect += correct;
+  updatedUser.stats.totalWrong += wrong;
+
+  if (won) updatedUser.stats.gamesWon += 1;
+
+  // --------------------
+  // HIGH SCORE (PER DIFFICULTY)
+  // --------------------
+  if (score > updatedUser.highScores[difficulty]) {
+    updatedUser.highScores[difficulty] = score;
+  }
+
+  // --------------------
+  // COINS
+  // --------------------
+  let coinsEarned = correct * 2;
+  if (won) coinsEarned += 10;
+
+  updatedUser.coins += coinsEarned;
+
+  // --------------------
+  // ACHIEVEMENTS
+  // --------------------
+  const unlocked = [];
+
+  if (
+    updatedUser.stats.gamesPlayed === 1 &&
+    !updatedUser.achievements.includes("first_game")
+  ) {
+    unlocked.push("first_game");
+  }
+
+  if (
+    won &&
+    !updatedUser.achievements.includes("first_win")
+  ) {
+    unlocked.push("first_win");
+  }
+
+  if (
+    wrong === 0 &&
+    !updatedUser.achievements.includes("flawless")
+  ) {
+    unlocked.push("flawless");
+  }
+
+  updatedUser.achievements.push(...unlocked);
+
+  await saveUserData(updatedUser);
+
+  return {
+    updatedUser,
+    coinsEarned,
+    unlockedAchievements: unlocked,
+  };
+};
+
+/* ----------------------------------
+   UPDATE DIFFICULTY
+----------------------------------- */
 export const updateDifficulty = async (userData, newDifficulty) => {
   const updatedUser = {
     ...userData,
     difficulty: newDifficulty,
-    highScore: 0, // reset by rule
+    highScores: {
+      ...userData.highScores,
+      [newDifficulty]: 0, // reset only this difficulty
+    },
   };
 
   await saveUserData(updatedUser);
   return updatedUser;
 };
 
-/**
- * Update high score if higher
- */
-export const updateHighScore = async (userData, newScore) => {
-  if (newScore <= userData.highScore) return userData;
-
-  const updatedUser = {
-    ...userData,
-    highScore: newScore,
-  };
-
-  await saveUserData(updatedUser);
-  return updatedUser;
-};
-
-/**
- * Hard reset (optional utility)
- */
+/* ----------------------------------
+   HARD RESET
+----------------------------------- */
 export const resetUserData = async () => {
   await AsyncStorage.setItem(
     STORAGE_KEY,

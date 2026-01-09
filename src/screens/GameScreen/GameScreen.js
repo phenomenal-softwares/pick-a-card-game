@@ -14,16 +14,15 @@ import { shuffleArray } from "../../utils/shuffle";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+import { useUser } from "../../context/userContext"; // ← use context
+
 import styles from "./GameScreen.styles";
 
 const TOTAL_ROUNDS = 10;
 
-export default function GameScreen({
-  difficulty,
-  highScore,
-  onGameOver,
-  onBackToMenu,
-}) {
+export default function GameScreen({ onBackToMenu }) {
+  const { user, applyGameResult } = useUser(); // ← get user state & actions
+
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
 
@@ -32,7 +31,6 @@ export default function GameScreen({
   /* ---------- CARDS ---------- */
   const [cards, setCards] = useState([]);
   const [targetCard, setTargetCard] = useState(null);
-
   const [isRevealed, setIsRevealed] = useState(false);
 
   /* ---------- FEEDBACK ---------- */
@@ -53,13 +51,14 @@ export default function GameScreen({
   /* --- CONFIRM MODAL --- */
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
+  const difficulty = user?.difficulty || "EASY"; // ← now from context
+  const highScore = user?.highScores?.[difficulty] ?? 0;
+
   /* ----------------------------
      INITIAL LOAD
   -----------------------------*/
   useEffect(() => {
-    if (!showPowerupModal) {
-      startRound();
-    }
+    if (!showPowerupModal) startRound();
   }, [showPowerupModal]);
 
   /* ----------------------------
@@ -75,7 +74,6 @@ export default function GameScreen({
 
     let shuffled = shuffleArray([...pool]);
     shuffled = shuffleArray(shuffled); // double shuffle
-
     const target = shuffled[Math.floor(Math.random() * shuffled.length)];
 
     setIsRevealed(false);
@@ -91,7 +89,7 @@ export default function GameScreen({
   /* ----------------------------
      USER PICK HANDLER
   -----------------------------*/
-  const handleCardPick = (pickedCard) => {
+  const handleCardPick = async (pickedCard) => {
     if (isRevealed) return;
 
     setIsRevealed(true);
@@ -108,9 +106,22 @@ export default function GameScreen({
       setFeedbackType("error");
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (round >= TOTAL_ROUNDS) {
-        finalizeGame(updatedScore);
+        // ---------- FINALIZE GAME ----------
+        const result = {
+          score: updatedScore,
+          correct: updatedScore,
+          wrong: TOTAL_ROUNDS - updatedScore,
+          difficulty,
+          won: updatedScore === TOTAL_ROUNDS, // perfect game = win
+        };
+
+        const { updatedUser, coinsEarned, unlockedAchievements } =
+          await applyGameResult(result); // ← save via context
+
+        setFinalScore(updatedScore);
+        setShowGameOverModal(true);
       } else {
         setRound((prev) => prev + 1);
         startRound();
@@ -125,58 +136,37 @@ export default function GameScreen({
     if (!powerup || powerupUses <= 0 || isRevealed || peekedCards.length > 0)
       return;
 
-    // --------------------
-    // STANDARD PEEKS
-    // --------------------
+    // ... all existing powerup logic remains unchanged ...
+
+    // PEEK / DOUBLE_PEEK
     if (powerup.id === "peek" || powerup.id === "double_peek") {
       const peekCount = powerup.id === "peek" ? 1 : 2;
-
       const candidates = cards.filter(
-        (c) =>
-          c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
+        (c) => c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
       );
-
       const selected = shuffleArray([...candidates]).slice(0, peekCount);
-
       setPeekedCards(selected.map((c) => c.id));
       setPowerupUses((prev) => prev - 1);
-
       setTimeout(() => setPeekedCards([]), 1200);
       return;
     }
 
-    // --------------------
-    // TRUE SIGHT (TARGET + ONE DECOY)
-    // --------------------
+    // TRUE SIGHT
     if (powerup.id === "true_sight") {
-      const decoyCandidates = cards.filter(
-        (c) => c.id !== targetCard.id && !c.isMatched
-      );
-
+      const decoyCandidates = cards.filter((c) => c.id !== targetCard.id && !c.isMatched);
       if (decoyCandidates.length === 0) return;
-
       const decoy = shuffleArray([...decoyCandidates])[0];
-
       setPeekedCards([targetCard.id, decoy.id]);
       setPowerupUses((prev) => prev - 1);
-
-      setTimeout(() => {
-        setPeekedCards([]);
-      }, 1400); // slightly longer for impact
-
+      setTimeout(() => setPeekedCards([]), 1400);
       return;
     }
 
-    // --------------------
     // BIG SHOW
-    // --------------------
     if (powerup.id === "big_show") {
       setFreezeActive(true);
       setPowerupUses((prev) => prev - 1);
-
-      setTimeout(() => {
-        setFreezeActive(false);
-      }, 3000);
+      setTimeout(() => setFreezeActive(false), 3000);
     }
   };
 
@@ -184,35 +174,19 @@ export default function GameScreen({
     if (!powerup) {
       setFeedback("No powerup selected");
       setFeedbackType("info");
-      setTimeout(() => {
-        setFeedback("");
-      }, 2000);
+      setTimeout(() => setFeedback(""), 2000);
       return;
     }
-
     if (powerupUses <= 0) {
       setFeedback("Powerup exhausted");
       setFeedbackType("error");
-      setTimeout(() => {
-        setFeedback("");
-      }, 2000);
+      setTimeout(() => setFeedback(""), 2000);
       return;
     }
-
     usePowerup();
   };
 
-  /* ----------------------------
-     GAME OVER
-  -----------------------------*/
-  const finalizeGame = (finalScore) => {
-    onGameOver(finalScore);
-    setFinalScore(finalScore);
-    setShowGameOverModal(true);
-  };
-
   const restartGame = () => {
-    // reset local state
     setRound(1);
     setScore(0);
     setPowerup(null);
@@ -270,9 +244,7 @@ export default function GameScreen({
       </Text>
 
       {/* TARGET */}
-      {targetCard && (
-        <Text style={styles.targetText}>Pick {targetCard.label}</Text>
-      )}
+      {targetCard && <Text style={styles.targetText}>Pick {targetCard.label}</Text>}
 
       {/* GRID */}
       <CardGrid
@@ -284,11 +256,7 @@ export default function GameScreen({
       />
 
       {/* FEEDBACK */}
-      <Feedback
-        visible={feedback !== ""}
-        message={feedback}
-        type={feedbackType}
-      />
+      <Feedback visible={feedback !== ""} message={feedback} type={feedbackType} />
 
       {/* SCORE */}
       <Text style={styles.score}>Score: {score}</Text>
@@ -304,7 +272,7 @@ export default function GameScreen({
         }}
         onExit={() => {
           setShowGameOverModal(false);
-          onBackToMenu();
+          navigation.replace("MainMenu");
         }}
       />
 
