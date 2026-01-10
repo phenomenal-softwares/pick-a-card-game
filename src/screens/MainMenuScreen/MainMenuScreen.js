@@ -45,7 +45,10 @@ export default function MainMenuScreen({ navigation }) {
           <Text style={styles.buttonText}>Achievements</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.disabledButton}>
+        <TouchableOpacity
+          style={styles.secondaryButton}
+          onPress={() => navigation.navigate("Stats")}
+        >
           <Text style={styles.buttonText}>Stats</Text>
         </TouchableOpacity>
       </View>

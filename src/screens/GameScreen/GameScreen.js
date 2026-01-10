@@ -20,7 +20,7 @@ import styles from "./GameScreen.styles";
 
 const TOTAL_ROUNDS = 10;
 
-export default function GameScreen({ onBackToMenu }) {
+export default function GameScreen() {
   const { user, applyGameResult } = useUser(); // ← get user state & actions
 
   const [round, setRound] = useState(1);
@@ -47,6 +47,9 @@ export default function GameScreen({ onBackToMenu }) {
   /* --- GAME OVER MODAL --- */
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
+  const [coinsEarned, setCoinsEarned] = useState(0);
+  const [unlockedAchievements, setUnlockedAchievements] = useState([]);
+  const [gameWon, setGameWon] = useState(false);
 
   /* --- CONFIRM MODAL --- */
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -107,26 +110,41 @@ export default function GameScreen({ onBackToMenu }) {
     }
 
     setTimeout(async () => {
-      if (round >= TOTAL_ROUNDS) {
-        // ---------- FINALIZE GAME ----------
-        const result = {
-          score: updatedScore,
-          correct: updatedScore,
-          wrong: TOTAL_ROUNDS - updatedScore,
-          difficulty,
-          won: updatedScore === TOTAL_ROUNDS, // perfect game = win
-        };
+  if (round >= TOTAL_ROUNDS) {
+    // ---------- FINALIZE GAME ----------
+    const correct = updatedScore;
+    const wrong = TOTAL_ROUNDS - updatedScore;
+    const won = correct >= TOTAL_ROUNDS / 2;
 
-        const { updatedUser, coinsEarned, unlockedAchievements } =
-          await applyGameResult(result); // ← save via context
+    const result = {
+      score: updatedScore,
+      correct,
+      wrong,
+      difficulty,
+      won,
+    };
 
-        setFinalScore(updatedScore);
-        setShowGameOverModal(true);
-      } else {
-        setRound((prev) => prev + 1);
-        startRound();
-      }
-    }, 1500);
+    try {
+      const {
+        updatedUser,
+        coinsEarned,
+        unlockedAchievements,
+      } = await applyGameResult(result);
+
+      // UI STATE ONLY
+      setFinalScore(updatedScore);
+      setCoinsEarned(coinsEarned);
+      setUnlockedAchievements(unlockedAchievements);
+      setGameWon(won);
+      setShowGameOverModal(true);
+    } catch (err) {
+      console.error("Game result processing failed:", err);
+    }
+  } else {
+    setRound((prev) => prev + 1);
+    startRound();
+  }
+}, 1500);
   };
 
   /* ----------------------------
@@ -266,6 +284,8 @@ export default function GameScreen({ onBackToMenu }) {
         visible={showGameOverModal}
         score={finalScore}
         highScore={highScore}
+        coinsEarned={coinsEarned}
+        won={gameWon}
         onRestart={() => {
           setShowGameOverModal(false);
           restartGame();

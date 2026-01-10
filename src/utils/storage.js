@@ -93,7 +93,7 @@ export const saveUserData = async (userData) => {
    PROCESS GAME RESULT (CORE ENGINE)
 ----------------------------------- */
 export const processGameResult = async (userData, result) => {
-  const { score, correct, wrong, difficulty, won } = result;
+  const { score, correct, wrong, difficulty, won, lost } = result;
 
   const updatedUser = {
     ...userData,
@@ -101,6 +101,8 @@ export const processGameResult = async (userData, result) => {
     highScores: { ...userData.highScores },
     achievements: [...userData.achievements],
   };
+
+  const unlocked = [];
 
   // --------------------
   // STATS
@@ -110,6 +112,11 @@ export const processGameResult = async (userData, result) => {
   updatedUser.stats.totalWrong += wrong;
 
   if (won) updatedUser.stats.gamesWon += 1;
+  else updatedUser.stats.gamesLost += 1;
+
+  if (wrong === 0 && won) {
+    updatedUser.stats.flawlessWins += 1;
+  }
 
   // --------------------
   // HIGH SCORE (PER DIFFICULTY)
@@ -129,27 +136,39 @@ export const processGameResult = async (userData, result) => {
   // --------------------
   // ACHIEVEMENTS
   // --------------------
-  const unlocked = [];
 
-  if (
-    updatedUser.stats.gamesPlayed === 1 &&
-    !updatedUser.achievements.includes("first_game")
-  ) {
+  const has = (id) => updatedUser.achievements.includes(id);
+
+  if (updatedUser.stats.gamesPlayed === 1 && !has("first_game")) {
     unlocked.push("first_game");
   }
 
-  if (
-    won &&
-    !updatedUser.achievements.includes("first_win")
-  ) {
+  if (won && !has("first_win")) {
     unlocked.push("first_win");
   }
 
-  if (
-    wrong === 0 &&
-    !updatedUser.achievements.includes("flawless")
-  ) {
+  if (won && wrong === 0 && !has("flawless")) {
     unlocked.push("flawless");
+  }
+
+  if (score >= 8 && !has("sharp_eye")) {
+    unlocked.push("sharp_eye");
+  }
+
+  if (updatedUser.stats.gamesPlayed >= 25 && !has("veteran")) {
+    unlocked.push("veteran");
+  }
+
+  if (updatedUser.stats.gamesPlayed >= 100 && !has("grinder")) {
+    unlocked.push("grinder");
+  }
+
+  if (won && difficulty === "HARD" && !has("hard_win")) {
+    unlocked.push("hard_win");
+  }
+
+  if (updatedUser.stats.flawlessWins >= 5 && !has("perfect_streak")) {
+    unlocked.push("perfect_streak");
   }
 
   updatedUser.achievements.push(...unlocked);
