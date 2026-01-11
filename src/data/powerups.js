@@ -9,6 +9,7 @@ export const POWERUPS = [
       pack: "Ionicons",
       name: "remove-circle",
     },
+    price: 100,
   },
   {
     id: "double_peek",
@@ -20,17 +21,19 @@ export const POWERUPS = [
       pack: "Ionicons",
       name: "radio-button-on",
     },
+    price: 250,
   },
   {
     id: "big_show",
     label: "Big Show",
-    description: "Reveal all cards for a longer moment.",
+    description: "Reveal all cards for a longer duration.",
     maxTargets: 0,
     rarity: "epic",
     icon: {
       pack: "Ionicons",
       name: "aperture",
     },
+    price: 500,
   },
   {
     id: "true_sight",
@@ -42,5 +45,6 @@ export const POWERUPS = [
       pack: "Ionicons",
       name: "eye",
     },
+    price: 500,
   },
 ];

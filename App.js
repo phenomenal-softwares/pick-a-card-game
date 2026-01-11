@@ -7,6 +7,7 @@ import SettingsScreen from "./src/screens/SettingsScreen/SettingsScreen";
 import GameScreen from "./src/screens/GameScreen/GameScreen";
 import AchievementsScreen from "./src/screens/AchievementsScreen/AchievementsScreen";
 import StatsScreen from "./src/screens/StatsScreen/StatsScreen";
+import ShopScreen from "./src/screens/ShopScreen/ShopScreen";
 
 import { UserProvider, useUser } from "./src/context/userContext";
 
@@ -43,6 +44,7 @@ export default function App() {
             <Stack.Screen name="Settings" component={SettingsScreen} />
             <Stack.Screen name="Achievements" component={AchievementsScreen} />
             <Stack.Screen name="Stats" component={StatsScreen} />
+            <Stack.Screen name="Shop" component={ShopScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AppLoader>

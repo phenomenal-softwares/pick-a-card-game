@@ -38,6 +38,13 @@ export default function MainMenuScreen({ navigation }) {
 
         <TouchableOpacity
           style={styles.secondaryButton}
+          onPress={() => navigation.navigate("Shop")}
+        >
+          <Text style={styles.buttonText}>Shop</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.secondaryButton}
           onPress={() => navigation.navigate("Settings")}
         >
           <Text style={styles.buttonText}>Settings</Text>

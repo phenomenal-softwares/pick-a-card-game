@@ -79,6 +79,31 @@ export const UserProvider = ({ children }) => {
     setUser(updated);
   };
 
+  // shop purchase
+  const addPowerups = async (powerupsToAdd, cost = 0) => {
+    if (!user) return;
+
+    if (cost > user.coins) {
+      // not enough coins
+      return { success: false, message: "Not enough coins" };
+    }
+
+    const updatedUser = {
+      ...user,
+      coins: user.coins - cost,
+      powerups: { ...user.powerups },
+    };
+
+    Object.entries(powerupsToAdd).forEach(([id, count]) => {
+      updatedUser.powerups[id] = (updatedUser.powerups[id] || 0) + count;
+    });
+
+    await saveUserData(updatedUser);
+    setUser(updatedUser);
+
+    return { success: true, message: "Purchase successful" };
+  };
+
   const changeDifficulty = async (difficulty) => {
     const updated = await updateDifficulty(user, difficulty);
     setUser(updated);
@@ -98,6 +123,7 @@ export const UserProvider = ({ children }) => {
         claimAchievement,
         usePowerup,
         grantPowerups,
+        addPowerups,
         changeDifficulty,
         hardReset,
       }}
