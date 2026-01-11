@@ -2,21 +2,25 @@ import { StyleSheet } from "react-native";
 
 export default StyleSheet.create({
   container: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginVertical: 8,
+    position: "absolute",
+    top: 90,
     alignSelf: "center",
-    minWidth: "70%",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 10,
+    zIndex: 999,
+    elevation: 6,
   },
 
   text: {
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: "700",
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
   },
 
-  /* ---- MOODS ---- */
+  info: {
+    backgroundColor: "#3b82f6",
+  },
 
   success: {
     backgroundColor: "#22c55e",
@@ -26,11 +30,7 @@ export default StyleSheet.create({
     backgroundColor: "#ef4444",
   },
 
-  info: {
-    backgroundColor: "#3b82f6",
-  },
-
   warning: {
-    backgroundColor: "#facc15",
+    backgroundColor: "#f59e0b",
   },
 });

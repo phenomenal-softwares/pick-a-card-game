@@ -24,15 +24,21 @@ export const ACHIEVEMENTS = [
     id: "sharp_eye",
     title: "Sharp Eye",
     description: "Score 8 or more correct picks in a game",
-    reward: { coins: 40, powerups: [] },
+    reward: { coins: 40, powerups: ["double_peek"] },
   },
 
   // --- PROGRESSION ---
   {
+    id: "rising",
+    title: "Rising Player",
+    description: "Play 5 games",
+    reward: { coins: 70, powerups: ["peek"] },
+  },
+  {
     id: "veteran",
     title: "Veteran",
     description: "Play 25 games",
-    reward: { coins: 100, powerups: ["peek"] },
+    reward: { coins: 100, powerups: ["true_sight"] },
   },
   {
     id: "grinder",

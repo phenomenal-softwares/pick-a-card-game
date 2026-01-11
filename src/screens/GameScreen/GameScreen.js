@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
+import { useUser } from "../../context/userContext";
+
 import CardGrid from "../../components/CardGrid/CardGrid";
 import Feedback from "../../components/Feedback/Feedback";
 
-import PowerupModal from "../../components/PowerupModal/PowerupModal";
+import PowerupsFooter from "../../components/PowerupsFooter/PowerupsFooter";
+
 import GameOverModal from "../../components/GameOverModal/GameOverModal";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 
@@ -13,16 +16,13 @@ import { shuffleArray } from "../../utils/shuffle";
 
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { renderPowerupIcon } from "../../utils/renderPowerupIcon";
-
-import { useUser } from "../../context/userContext";
 
 import styles from "./GameScreen.styles";
 
 const TOTAL_ROUNDS = 10;
 
 export default function GameScreen() {
-  const { user, applyGameResult } = useUser(); // ← get user state & actions
+  const { user, applyGameResult, usePowerup } = useUser();
 
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
@@ -35,13 +35,15 @@ export default function GameScreen() {
   const [isRevealed, setIsRevealed] = useState(false);
 
   /* ---------- FEEDBACK ---------- */
-  const [feedback, setFeedback] = useState("");
-  const [feedbackType, setFeedbackType] = useState("info");
+  const [feedback, setFeedback] = useState({
+    visible: false,
+    message: "",
+    type: "info",
+  });
 
   /* ---------- POWERUPS ---------- */
-  const [showPowerupModal, setShowPowerupModal] = useState(true);
-  const [powerup, setPowerup] = useState(null);
-  const [powerupUses, setPowerupUses] = useState(0);
+  const powerups = user?.powerups || {};
+
   const [peekedCards, setPeekedCards] = useState([]);
   const [freezeActive, setFreezeActive] = useState(false);
 
@@ -49,8 +51,8 @@ export default function GameScreen() {
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [coinsEarned, setCoinsEarned] = useState(0);
-  const [unlockedAchievements, setUnlockedAchievements] = useState([]);
   const [gameWon, setGameWon] = useState(false);
+  const [unlockedAchievements, setUnlockedAchievements] = useState([]);
 
   /* --- CONFIRM MODAL --- */
   const [showExitConfirm, setShowExitConfirm] = useState(false);
@@ -62,8 +64,8 @@ export default function GameScreen() {
      INITIAL LOAD
   -----------------------------*/
   useEffect(() => {
-    if (!showPowerupModal) startRound();
-  }, [showPowerupModal]);
+    startRound();
+  }, []);
 
   /* ----------------------------
      ROUND INITIALIZATION
@@ -81,7 +83,6 @@ export default function GameScreen() {
     const target = shuffled[Math.floor(Math.random() * shuffled.length)];
 
     setIsRevealed(false);
-    setFeedback("");
     setPeekedCards([]);
 
     setTimeout(() => {
@@ -103,11 +104,9 @@ export default function GameScreen() {
 
     if (isCorrect) {
       setScore(updatedScore);
-      setFeedback("Correct!");
-      setFeedbackType("success");
+      setFeedback({ visible: true, message: "Correct!", type: "success" });
     } else {
-      setFeedback("Wrong!");
-      setFeedbackType("error");
+      setFeedback({ visible: true, message: "Wrong!", type: "error" });
     }
 
     setTimeout(async () => {
@@ -148,86 +147,67 @@ export default function GameScreen() {
   /* ----------------------------
      POWERUP USAGE
   -----------------------------*/
-  const usePowerup = () => {
-    if (!powerup || powerupUses <= 0 || isRevealed || peekedCards.length > 0)
-      return;
+  const handleUsePowerup = async (powerupId) => {
+    const available = powerups[powerupId] ?? 0;
 
-    // ... all existing powerup logic remains unchanged ...
+    if (available <= 0 || isRevealed || peekedCards.length > 0) return;
 
-    // PEEK / DOUBLE_PEEK
-    if (powerup.id === "peek" || powerup.id === "double_peek") {
-      const peekCount = powerup.id === "peek" ? 1 : 2;
+    // --- PEEK / DOUBLE PEEK ---
+    if (powerupId === "peek" || powerupId === "double_peek") {
+      const peekCount = powerupId === "peek" ? 1 : 2;
+
       const candidates = cards.filter(
         (c) =>
           c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
       );
+
       const selected = shuffleArray([...candidates]).slice(0, peekCount);
+
       setPeekedCards(selected.map((c) => c.id));
-      setPowerupUses((prev) => prev - 1);
+      await usePowerup(powerupId);
+
+      setFeedback({ visible: true, message: "PEEK!", type: "info" });
       setTimeout(() => setPeekedCards([]), 1200);
       return;
     }
 
-    // TRUE SIGHT
-    if (powerup.id === "true_sight") {
+    // --- TRUE SIGHT ---
+    if (powerupId === "true_sight") {
       const decoyCandidates = cards.filter(
         (c) => c.id !== targetCard.id && !c.isMatched
       );
-      if (decoyCandidates.length === 0) return;
+
+      if (!decoyCandidates.length) return;
+
       const decoy = shuffleArray([...decoyCandidates])[0];
+
       setPeekedCards([targetCard.id, decoy.id]);
-      setPowerupUses((prev) => prev - 1);
+      await usePowerup(powerupId);
+
+      setFeedback({ visible: true, message: "TRUE SIGHT!", type: "info" });
       setTimeout(() => setPeekedCards([]), 1400);
       return;
     }
 
-    // BIG SHOW
-    if (powerup.id === "big_show") {
+    // --- BIG SHOW ---
+    if (powerupId === "big_show") {
       setFreezeActive(true);
-      setPowerupUses((prev) => prev - 1);
+      await usePowerup(powerupId);
+
+      setFeedback({ visible: true, message: "BIG SHOW!", type: "info" });
       setTimeout(() => setFreezeActive(false), 3000);
     }
-  };
-
-  const handlePowerupPress = () => {
-    if (!powerup) {
-      setFeedback("No powerup selected");
-      setFeedbackType("info");
-      setTimeout(() => setFeedback(""), 2000);
-      return;
-    }
-    if (powerupUses <= 0) {
-      setFeedback("Powerup exhausted");
-      setFeedbackType("error");
-      setTimeout(() => setFeedback(""), 2000);
-      return;
-    }
-    usePowerup();
   };
 
   const restartGame = () => {
     setRound(1);
     setScore(0);
-    setPowerup(null);
-    setPowerupUses(0);
-    setShowPowerupModal(true);
     setPeekedCards([]);
+    startRound();
   };
 
   return (
     <View style={styles.container}>
-      {/* POWERUP SELECTION */}
-      {showPowerupModal && (
-        <PowerupModal
-          visible={showPowerupModal}
-          onComplete={({ powerup, count }) => {
-            setPowerup(powerup);
-            setPowerupUses(count);
-            setShowPowerupModal(false);
-          }}
-        />
-      )}
-
       {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.highScore}>High Score: {highScore}</Text>
@@ -246,29 +226,6 @@ export default function GameScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* POWERUP BUTTON */}
-      <TouchableOpacity
-        style={[
-          styles.powerupButton,
-          (!powerup || powerupUses <= 0) && styles.powerupButtonDisabled,
-          freezeActive && styles.powerupButtonActive,
-        ]}
-        onPress={handlePowerupPress}
-        disabled={!powerup || powerupUses <= 0}
-      >
-        <View style={styles.powerupContent}>
-          {powerup ? (
-            <>
-              {renderPowerupIcon(powerup.icon, { size: 22 })}
-
-              <Text style={styles.powerupCount}>{powerupUses}</Text>
-            </>
-          ) : (
-            <Text style={styles.powerupEmpty}>—</Text>
-          )}
-        </View>
-      </TouchableOpacity>
-
       {/* TARGET */}
       {targetCard && (
         <Text style={styles.targetText}>Pick {targetCard.label}</Text>
@@ -283,15 +240,22 @@ export default function GameScreen() {
         onCardPick={handleCardPick}
       />
 
-      {/* FEEDBACK */}
       <Feedback
-        visible={feedback !== ""}
-        message={feedback}
-        type={feedbackType}
+        visible={feedback.visible}
+        message={feedback.message}
+        type={feedback.type}
+        onHide={() => setFeedback((f) => ({ ...f, visible: false }))}
       />
 
       {/* SCORE */}
       <Text style={styles.score}>Score: {score}</Text>
+
+      {/* POWERUPS FOOTER */}
+      <PowerupsFooter
+        inventory={powerups}
+        onUse={handleUsePowerup}
+        disabled={freezeActive || isRevealed}
+      />
 
       {/* GAME OVER MODAL */}
       <GameOverModal

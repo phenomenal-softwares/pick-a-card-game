@@ -7,7 +7,7 @@ export const POWERUPS = [
     rarity: "common",
     icon: {
       pack: "Ionicons",
-      name: "eye",
+      name: "remove-circle",
     },
   },
   {
@@ -18,7 +18,7 @@ export const POWERUPS = [
     rarity: "rare",
     icon: {
       pack: "Ionicons",
-      name: "switch",
+      name: "radio-button-on",
     },
   },
   {
@@ -28,8 +28,8 @@ export const POWERUPS = [
     maxTargets: 0,
     rarity: "epic",
     icon: {
-      pack: "MaterialCommunityIcons",
-      name: "cards",
+      pack: "Ionicons",
+      name: "aperture",
     },
   },
   {
@@ -40,7 +40,7 @@ export const POWERUPS = [
     rarity: "epic",
     icon: {
       pack: "Ionicons",
-      name: "locate",
+      name: "eye",
     },
   },
 ];

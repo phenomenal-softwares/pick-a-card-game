@@ -11,7 +11,7 @@ import { useUser } from "../../context/userContext";
 import styles from "./AchievementsScreen.styles";
 
 export default function AchievementsScreen() {
-  const { user, claimAchievement } = useUser();
+  const { user, claimAchievement, grantPowerups } = useUser();
   const navigation = useNavigation();
   const [selected, setSelected] = useState(null);
 

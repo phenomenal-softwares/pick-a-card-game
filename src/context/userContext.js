@@ -3,6 +3,7 @@ import {
   loadUserData,
   processGameResult,
   updateDifficulty,
+  addPowerups,
   saveUserData,
   resetUserData,
 } from "../utils/storage";
@@ -30,28 +31,52 @@ export const UserProvider = ({ children }) => {
     return response;
   };
 
-  // inside UserProvider
   const claimAchievement = async (achievement) => {
     if (!user) return;
 
     const claimed = user.claimedAchievements ?? [];
-    if (claimed.includes(achievement.id)) return; // already claimed
+    if (claimed.includes(achievement.id)) return;
+
+    // clone existing powerups
+    const updatedPowerups = { ...(user.powerups || {}) };
+
+    // add powerups rewards
+    if (achievement.reward.powerups?.length) {
+      achievement.reward.powerups.forEach((id) => {
+        updatedPowerups[id] = (updatedPowerups[id] || 0) + 1;
+      });
+    }
 
     const updatedUser = {
       ...user,
       coins: user.coins + (achievement.reward.coins || 0),
+      powerups: updatedPowerups,
       claimedAchievements: [...claimed, achievement.id],
-      powerups: [
-        ...(user.powerups || []),
-        ...(achievement.reward.powerups || []),
-      ],
     };
 
-    // Save to storage
     await saveUserData(updatedUser);
-
-    // Update context state
     setUser(updatedUser);
+  };
+
+  const usePowerup = async (powerupId) => {
+    const count = user.powerups?.[powerupId] ?? 0;
+    if (count <= 0) return;
+
+    const updatedUser = {
+      ...user,
+      powerups: {
+        ...user.powerups,
+        [powerupId]: count - 1,
+      },
+    };
+
+    await saveUserData(updatedUser);
+    setUser(updatedUser);
+  };
+
+  const grantPowerups = async (powerups) => {
+    const updated = await addPowerups(user, powerups);
+    setUser(updated);
   };
 
   const changeDifficulty = async (difficulty) => {
@@ -71,6 +96,8 @@ export const UserProvider = ({ children }) => {
         loading,
         applyGameResult,
         claimAchievement,
+        usePowerup,
+        grantPowerups,
         changeDifficulty,
         hardReset,
       }}

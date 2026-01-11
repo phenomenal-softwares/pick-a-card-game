@@ -2,6 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "PICK_A_CARD_USER";
 
+/* ----------------------------------
+   DEFAULT USER DATA
+----------------------------------- */
 const DEFAULT_USER_DATA = {
   difficulty: "EASY",
 
@@ -13,15 +16,24 @@ const DEFAULT_USER_DATA = {
 
   coins: 0,
 
+  powerups: {
+    peek: 2,
+    double_peek: 1,
+    big_show: 0,
+    true_sight: 1,
+  },
+
   stats: {
     gamesPlayed: 0,
     gamesWon: 0,
+    gamesLost: 0,
+    flawlessWins: 0,
     totalCorrect: 0,
     totalWrong: 0,
   },
 
   achievements: [],
-  claimedAchievements: [], // claimed achievement IDs
+  claimedAchievements: [],
 };
 
 /* ----------------------------------
@@ -34,7 +46,7 @@ export const loadUserData = async () => {
     if (stored) {
       const parsed = JSON.parse(stored);
 
-      // 🔄 Migration: old single highScore → per-difficulty
+      // ---- High score migration
       if (!parsed.highScores) {
         parsed.highScores = {
           EASY: parsed.highScore || 0,
@@ -44,30 +56,31 @@ export const loadUserData = async () => {
         delete parsed.highScore;
       }
 
-      // Ensure coins
+      // ---- Coins
       if (parsed.coins == null) parsed.coins = 0;
 
-      // Ensure stats integrity
-      parsed.stats = {
-        gamesPlayed: parsed.stats?.gamesPlayed ?? 0,
-        gamesWon: parsed.stats?.gamesWon ?? 0,
-        totalCorrect: parsed.stats?.totalCorrect ?? 0,
-        totalWrong: parsed.stats?.totalWrong ?? 0,
+      // ---- Powerups (merge defaults)
+      parsed.powerups = {
+        ...DEFAULT_USER_DATA.powerups,
+        ...(parsed.powerups || {}),
       };
 
-      // Ensure achievements
-      if (!Array.isArray(parsed.achievements)) {
-        parsed.achievements = [];
-      }
+      // ---- Stats (full integrity)
+      parsed.stats = {
+        ...DEFAULT_USER_DATA.stats,
+        ...(parsed.stats || {}),
+      };
+
+      // ---- Achievements
+      if (!Array.isArray(parsed.achievements)) parsed.achievements = [];
+      if (!Array.isArray(parsed.claimedAchievements))
+        parsed.claimedAchievements = [];
 
       await saveUserData(parsed);
       return parsed;
     }
 
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(DEFAULT_USER_DATA)
-    );
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_USER_DATA));
     return DEFAULT_USER_DATA;
   } catch (err) {
     console.warn("Failed to load user data:", err);
@@ -80,10 +93,7 @@ export const loadUserData = async () => {
 ----------------------------------- */
 export const saveUserData = async (userData) => {
   try {
-    await AsyncStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(userData)
-    );
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
   } catch (err) {
     console.warn("Failed to save user data:", err);
   }
@@ -93,7 +103,7 @@ export const saveUserData = async (userData) => {
    PROCESS GAME RESULT (CORE ENGINE)
 ----------------------------------- */
 export const processGameResult = async (userData, result) => {
-  const { score, correct, wrong, difficulty, won, lost } = result;
+  const { score, correct, wrong, difficulty, won } = result;
 
   const updatedUser = {
     ...userData,
@@ -104,72 +114,57 @@ export const processGameResult = async (userData, result) => {
 
   const unlocked = [];
 
-  // --------------------
-  // STATS
-  // --------------------
+  // ---- Stats
   updatedUser.stats.gamesPlayed += 1;
   updatedUser.stats.totalCorrect += correct;
   updatedUser.stats.totalWrong += wrong;
 
-  if (won) updatedUser.stats.gamesWon += 1;
-  else updatedUser.stats.gamesLost += 1;
+  if (won) {
+    updatedUser.stats.gamesWon += 1;
+  } else {
+    updatedUser.stats.gamesLost += 1;
+  }
 
-  if (wrong === 0 && won) {
+  if (won && wrong === 0) {
     updatedUser.stats.flawlessWins += 1;
   }
 
-  // --------------------
-  // HIGH SCORE (PER DIFFICULTY)
-  // --------------------
+  // ---- High score
   if (score > updatedUser.highScores[difficulty]) {
     updatedUser.highScores[difficulty] = score;
   }
 
-  // --------------------
-  // COINS
-  // --------------------
+  // ---- Coins
   let coinsEarned = correct * 2;
   if (won) coinsEarned += 10;
-
   updatedUser.coins += coinsEarned;
 
-  // --------------------
-  // ACHIEVEMENTS
-  // --------------------
-
+  // ---- Achievements
   const has = (id) => updatedUser.achievements.includes(id);
 
-  if (updatedUser.stats.gamesPlayed === 1 && !has("first_game")) {
+  if (updatedUser.stats.gamesPlayed === 1 && !has("first_game"))
     unlocked.push("first_game");
-  }
 
-  if (won && !has("first_win")) {
-    unlocked.push("first_win");
-  }
+  if (won && !has("first_win")) unlocked.push("first_win");
 
-  if (won && wrong === 0 && !has("flawless")) {
-    unlocked.push("flawless");
-  }
+  if (won && wrong === 0 && !has("flawless")) unlocked.push("flawless");
 
-  if (score >= 8 && !has("sharp_eye")) {
-    unlocked.push("sharp_eye");
-  }
+  if (score >= 8 && !has("sharp_eye")) unlocked.push("sharp_eye");
 
-  if (updatedUser.stats.gamesPlayed >= 25 && !has("veteran")) {
+  if (updatedUser.stats.gamesPlayed >= 5 && !has("rising"))
+    unlocked.push("rising");
+
+  if (updatedUser.stats.gamesPlayed >= 25 && !has("veteran"))
     unlocked.push("veteran");
-  }
 
-  if (updatedUser.stats.gamesPlayed >= 100 && !has("grinder")) {
+  if (updatedUser.stats.gamesPlayed >= 100 && !has("grinder"))
     unlocked.push("grinder");
-  }
 
-  if (won && difficulty === "HARD" && !has("hard_win")) {
+  if (won && difficulty === "HARD" && !has("hard_win"))
     unlocked.push("hard_win");
-  }
 
-  if (updatedUser.stats.flawlessWins >= 5 && !has("perfect_streak")) {
+  if (updatedUser.stats.flawlessWins >= 5 && !has("perfect_streak"))
     unlocked.push("perfect_streak");
-  }
 
   updatedUser.achievements.push(...unlocked);
 
@@ -183,6 +178,23 @@ export const processGameResult = async (userData, result) => {
 };
 
 /* ----------------------------------
+   ADD POWERUPS (SHOP / REWARDS)
+----------------------------------- */
+export const addPowerups = async (userData, additions) => {
+  const updatedUser = {
+    ...userData,
+    powerups: { ...userData.powerups },
+  };
+
+  Object.entries(additions).forEach(([id, count]) => {
+    updatedUser.powerups[id] = (updatedUser.powerups[id] || 0) + count;
+  });
+
+  await saveUserData(updatedUser);
+  return updatedUser;
+};
+
+/* ----------------------------------
    UPDATE DIFFICULTY
 ----------------------------------- */
 export const updateDifficulty = async (userData, newDifficulty) => {
@@ -191,7 +203,7 @@ export const updateDifficulty = async (userData, newDifficulty) => {
     difficulty: newDifficulty,
     highScores: {
       ...userData.highScores,
-      [newDifficulty]: 0, // reset only this difficulty
+      [newDifficulty]: 0,
     },
   };
 
@@ -203,9 +215,6 @@ export const updateDifficulty = async (userData, newDifficulty) => {
    HARD RESET
 ----------------------------------- */
 export const resetUserData = async () => {
-  await AsyncStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(DEFAULT_USER_DATA)
-  );
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_USER_DATA));
   return DEFAULT_USER_DATA;
 };
