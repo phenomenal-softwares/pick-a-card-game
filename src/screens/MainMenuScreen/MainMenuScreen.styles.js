@@ -45,6 +45,20 @@ export default StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
   },
+  achievementButtonContent: {
+    position: "relative",
+    alignItems: "center",
+  },
+
+  redDot: {
+    position: "absolute",
+    top: -4,
+    right: -10,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#ef4444",
+  },
   disabledButton: {
     backgroundColor: "#555",
     paddingVertical: 14,

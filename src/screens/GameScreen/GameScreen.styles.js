@@ -73,6 +73,24 @@ export default StyleSheet.create({
     opacity: 0.6,
   },
 
+  powerupContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+
+  powerupCount: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#f9fafb",
+  },
+
+  powerupEmpty: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#6b7280",
+  },
+
   targetText: {
     fontSize: 22,
     fontWeight: "bold",

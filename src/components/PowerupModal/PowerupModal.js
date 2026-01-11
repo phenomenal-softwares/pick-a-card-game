@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
 import { POWERUPS } from "../../data/powerups";
 import { shuffleArray } from "../../utils/shuffle";
+import { renderPowerupIcon } from "../../utils/renderPowerupIcon";
+import Feedback from "../Feedback/Feedback";
 import styles from "./PowerupModal.styles";
 
 const COUNTERS = [1, 2, 5];
@@ -12,6 +14,10 @@ export default function PowerupModal({ visible, onComplete }) {
   const [shuffledPowerups, setShuffledPowerups] = useState([]);
   const [shuffledCounters, setShuffledCounters] = useState([]);
   const [stage, setStage] = useState("powerup"); // powerup | counter
+
+  /* ---------- FEEDBACK ---------- */
+  const [feedback, setFeedback] = useState("");
+  const [feedbackType, setFeedbackType] = useState("success");
 
   useEffect(() => {
     if (visible) {
@@ -39,7 +45,10 @@ export default function PowerupModal({ visible, onComplete }) {
 
   const handlePowerupPick = (item) => {
     if (selectedPowerup) return;
+
     setSelectedPowerup(item);
+    setFeedback(`Selected ${item.label}!`);
+    setFeedbackType("success");
     setStage("counter");
   };
 
@@ -52,6 +61,14 @@ export default function PowerupModal({ visible, onComplete }) {
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         <View style={styles.container}>
+          {/* FEEDBACK */}
+          <Feedback
+            visible={feedback !== ""}
+            message={feedback}
+            type={feedbackType}
+          />
+
+          {/* TITLE */}
           <Text style={styles.title}>Pick a Powerup</Text>
 
           {/* Powerup Cards */}
@@ -67,7 +84,7 @@ export default function PowerupModal({ visible, onComplete }) {
                   disabled={!!selectedPowerup}
                 >
                   <Text style={styles.cardText}>
-                    {opened ? item.label : "?"}
+                    {opened ? renderPowerupIcon(item.icon) : "?"}
                   </Text>
                 </TouchableOpacity>
               );

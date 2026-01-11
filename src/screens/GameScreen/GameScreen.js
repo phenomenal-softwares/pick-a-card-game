@@ -13,8 +13,9 @@ import { shuffleArray } from "../../utils/shuffle";
 
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { renderPowerupIcon } from "../../utils/renderPowerupIcon";
 
-import { useUser } from "../../context/userContext"; // ← use context
+import { useUser } from "../../context/userContext";
 
 import styles from "./GameScreen.styles";
 
@@ -110,41 +111,38 @@ export default function GameScreen() {
     }
 
     setTimeout(async () => {
-  if (round >= TOTAL_ROUNDS) {
-    // ---------- FINALIZE GAME ----------
-    const correct = updatedScore;
-    const wrong = TOTAL_ROUNDS - updatedScore;
-    const won = correct >= TOTAL_ROUNDS / 2;
+      if (round >= TOTAL_ROUNDS) {
+        // ---------- FINALIZE GAME ----------
+        const correct = updatedScore;
+        const wrong = TOTAL_ROUNDS - updatedScore;
+        const won = correct >= TOTAL_ROUNDS / 2;
 
-    const result = {
-      score: updatedScore,
-      correct,
-      wrong,
-      difficulty,
-      won,
-    };
+        const result = {
+          score: updatedScore,
+          correct,
+          wrong,
+          difficulty,
+          won,
+        };
 
-    try {
-      const {
-        updatedUser,
-        coinsEarned,
-        unlockedAchievements,
-      } = await applyGameResult(result);
+        try {
+          const { updatedUser, coinsEarned, unlockedAchievements } =
+            await applyGameResult(result);
 
-      // UI STATE ONLY
-      setFinalScore(updatedScore);
-      setCoinsEarned(coinsEarned);
-      setUnlockedAchievements(unlockedAchievements);
-      setGameWon(won);
-      setShowGameOverModal(true);
-    } catch (err) {
-      console.error("Game result processing failed:", err);
-    }
-  } else {
-    setRound((prev) => prev + 1);
-    startRound();
-  }
-}, 1500);
+          // UI STATE ONLY
+          setFinalScore(updatedScore);
+          setCoinsEarned(coinsEarned);
+          setUnlockedAchievements(unlockedAchievements);
+          setGameWon(won);
+          setShowGameOverModal(true);
+        } catch (err) {
+          console.error("Game result processing failed:", err);
+        }
+      } else {
+        setRound((prev) => prev + 1);
+        startRound();
+      }
+    }, 1500);
   };
 
   /* ----------------------------
@@ -160,7 +158,8 @@ export default function GameScreen() {
     if (powerup.id === "peek" || powerup.id === "double_peek") {
       const peekCount = powerup.id === "peek" ? 1 : 2;
       const candidates = cards.filter(
-        (c) => c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
+        (c) =>
+          c.id !== targetCard.id && !c.isMatched && !peekedCards.includes(c.id)
       );
       const selected = shuffleArray([...candidates]).slice(0, peekCount);
       setPeekedCards(selected.map((c) => c.id));
@@ -171,7 +170,9 @@ export default function GameScreen() {
 
     // TRUE SIGHT
     if (powerup.id === "true_sight") {
-      const decoyCandidates = cards.filter((c) => c.id !== targetCard.id && !c.isMatched);
+      const decoyCandidates = cards.filter(
+        (c) => c.id !== targetCard.id && !c.isMatched
+      );
       if (decoyCandidates.length === 0) return;
       const decoy = shuffleArray([...decoyCandidates])[0];
       setPeekedCards([targetCard.id, decoy.id]);
@@ -246,23 +247,32 @@ export default function GameScreen() {
       </View>
 
       {/* POWERUP BUTTON */}
-      <Text
+      <TouchableOpacity
         style={[
           styles.powerupButton,
           (!powerup || powerupUses <= 0) && styles.powerupButtonDisabled,
           freezeActive && styles.powerupButtonActive,
         ]}
         onPress={handlePowerupPress}
+        disabled={!powerup || powerupUses <= 0}
       >
-        {powerup
-          ? powerupUses > 0
-            ? `🧪 ${powerup.label} (${powerupUses})`
-            : `🧪 ${powerup.label} (empty)`
-          : "🧪 No Powerup"}
-      </Text>
+        <View style={styles.powerupContent}>
+          {powerup ? (
+            <>
+              {renderPowerupIcon(powerup.icon, { size: 22 })}
+
+              <Text style={styles.powerupCount}>{powerupUses}</Text>
+            </>
+          ) : (
+            <Text style={styles.powerupEmpty}>—</Text>
+          )}
+        </View>
+      </TouchableOpacity>
 
       {/* TARGET */}
-      {targetCard && <Text style={styles.targetText}>Pick {targetCard.label}</Text>}
+      {targetCard && (
+        <Text style={styles.targetText}>Pick {targetCard.label}</Text>
+      )}
 
       {/* GRID */}
       <CardGrid
@@ -274,7 +284,11 @@ export default function GameScreen() {
       />
 
       {/* FEEDBACK */}
-      <Feedback visible={feedback !== ""} message={feedback} type={feedbackType} />
+      <Feedback
+        visible={feedback !== ""}
+        message={feedback}
+        type={feedbackType}
+      />
 
       {/* SCORE */}
       <Text style={styles.score}>Score: {score}</Text>

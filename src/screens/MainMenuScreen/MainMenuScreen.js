@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { useUser } from "../../context/userContext"; // ← context
+import { useUser } from "../../context/userContext";
 import styles from "./MainMenuScreen.styles";
 
 export default function MainMenuScreen({ navigation }) {
@@ -9,6 +9,11 @@ export default function MainMenuScreen({ navigation }) {
 
   const { difficulty, coins, highScores } = user;
   const highScore = highScores[difficulty] ?? 0;
+
+  const unlocked = user.achievements ?? [];
+  const claimed = user.claimedAchievements ?? [];
+
+  const hasUnclaimedAchievements = unlocked.some((id) => !claimed.includes(id));
 
   return (
     <View style={styles.container}>
@@ -42,7 +47,11 @@ export default function MainMenuScreen({ navigation }) {
           style={styles.secondaryButton}
           onPress={() => navigation.navigate("Achievements")}
         >
-          <Text style={styles.buttonText}>Achievements</Text>
+          <View style={styles.achievementButtonContent}>
+            <Text style={styles.buttonText}>Achievements</Text>
+
+            {hasUnclaimedAchievements && <View style={styles.redDot} />}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
