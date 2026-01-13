@@ -1,4 +1,4 @@
-import { Pressable } from "react-native";
+import { TouchableOpacity } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -44,7 +44,7 @@ export default function Card({
   });
 
   return (
-    <Pressable
+    <TouchableOpacity
       disabled={isRevealed || isPeeked || freezeActive}
       onPress={() => onPick(card)}
       style={styles.wrapper}
@@ -61,6 +61,6 @@ export default function Card({
           { backgroundColor: card.value },
         ]}
       />
-    </Pressable>
+    </TouchableOpacity>
   );
 }

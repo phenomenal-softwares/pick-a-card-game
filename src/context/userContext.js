@@ -3,7 +3,6 @@ import {
   loadUserData,
   processGameResult,
   updateDifficulty,
-  addPowerups,
   saveUserData,
   resetUserData,
 } from "../utils/storage";
@@ -58,7 +57,7 @@ export const UserProvider = ({ children }) => {
     setUser(updatedUser);
   };
 
-  const usePowerup = async (powerupId) => {
+  const consumePowerup = async (powerupId) => {
     const count = user.powerups?.[powerupId] ?? 0;
     if (count <= 0) return;
 
@@ -121,7 +120,7 @@ export const UserProvider = ({ children }) => {
         loading,
         applyGameResult,
         claimAchievement,
-        usePowerup,
+        consumePowerup,
         grantPowerups,
         addPowerups,
         changeDifficulty,

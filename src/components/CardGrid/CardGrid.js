@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,8 +8,8 @@ import Animated, {
 
 import Card from "../Card/Card";
 
-const CARD_SIZE = 126; // solid, readable
-const GAP = -20;      // tight but breathable
+const CARD_SIZE = 126;
+const GAP = -20;
 
 export default function CardGrid({
   cards,
@@ -23,10 +23,8 @@ export default function CardGrid({
   const columns = cardCount <= 4 ? 2 : 3;
   const rows = Math.ceil(cardCount / columns);
 
-  const gridWidth =
-    columns * CARD_SIZE + (columns - 1) * GAP;
-  const gridHeight =
-    rows * CARD_SIZE + (rows - 1) * GAP;
+  const gridWidth = columns * CARD_SIZE + (columns - 1) * GAP;
+  const gridHeight = rows * CARD_SIZE + (rows - 1) * GAP;
 
   return (
     <View
@@ -69,7 +67,7 @@ function AnimatedCard({
   const x = useSharedValue(0);
   const y = useSharedValue(0);
 
-  const duration = freezeActive ? 1400 : 600;
+  const duration = freezeActive ? 1600 : 600;
 
   useEffect(() => {
     const row = Math.floor(index / columns);
@@ -80,10 +78,7 @@ function AnimatedCard({
   }, [index, columns, freezeActive]);
 
   const style = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: x.value },
-      { translateY: y.value },
-    ],
+    transform: [{ translateX: x.value }, { translateY: y.value }],
   }));
 
   return (
@@ -120,4 +115,3 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
 });
-

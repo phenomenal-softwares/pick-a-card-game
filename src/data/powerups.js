@@ -2,7 +2,7 @@ export const POWERUPS = [
   {
     id: "peek",
     label: "Peek",
-    description: "Reveal one random card briefly.",
+    description: "Reveal one random card briefly",
     maxTargets: 1,
     rarity: "common",
     icon: {
@@ -13,20 +13,20 @@ export const POWERUPS = [
   },
   {
     id: "double_peek",
-    label: "Double Peek",
-    description: "Reveal two random cards briefly.",
+    label: "50/50",
+    description: "Reveal half of the cards briefly",
     maxTargets: 2,
     rarity: "rare",
     icon: {
       pack: "Ionicons",
-      name: "radio-button-on",
+      name: "disc",
     },
     price: 250,
   },
   {
     id: "big_show",
     label: "Big Show",
-    description: "Reveal all cards for a longer duration.",
+    description: "Show all cards and slow down shuffle",
     maxTargets: 0,
     rarity: "epic",
     icon: {
@@ -38,7 +38,7 @@ export const POWERUPS = [
   {
     id: "true_sight",
     label: "True Sight",
-    description: "Reveal the target card and one decoy briefly.",
+    description: "Reveal the target card and one decoy",
     maxTargets: 2,
     rarity: "epic",
     icon: {

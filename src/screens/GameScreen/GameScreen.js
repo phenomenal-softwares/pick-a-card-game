@@ -22,7 +22,7 @@ import styles from "./GameScreen.styles";
 const TOTAL_ROUNDS = 10;
 
 export default function GameScreen() {
-  const { user, applyGameResult, usePowerup } = useUser();
+  const { user, applyGameResult, consumePowerup } = useUser();
 
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
@@ -96,7 +96,6 @@ export default function GameScreen() {
   -----------------------------*/
   const handleCardPick = async (pickedCard) => {
     if (isRevealed) return;
-
     setIsRevealed(true);
 
     const isCorrect = pickedCard.id === targetCard.id;
@@ -154,7 +153,8 @@ export default function GameScreen() {
 
     // --- PEEK / DOUBLE PEEK ---
     if (powerupId === "peek" || powerupId === "double_peek") {
-      const peekCount = powerupId === "peek" ? 1 : 2;
+      const pool = CARD_POOLS[difficulty];
+      const peekCount = powerupId === "peek" ? 1 : pool.length / 2;
 
       const candidates = cards.filter(
         (c) =>
@@ -164,9 +164,13 @@ export default function GameScreen() {
       const selected = shuffleArray([...candidates]).slice(0, peekCount);
 
       setPeekedCards(selected.map((c) => c.id));
-      await usePowerup(powerupId);
+      await consumePowerup(powerupId);
 
-      setFeedback({ visible: true, message: "PEEK!", type: "info" });
+      setFeedback({
+        visible: true,
+        message: powerupId === "peek" ? "PEEK!" : "50/50!",
+        type: "info",
+      });
       setTimeout(() => setPeekedCards([]), 1200);
       return;
     }
@@ -182,7 +186,7 @@ export default function GameScreen() {
       const decoy = shuffleArray([...decoyCandidates])[0];
 
       setPeekedCards([targetCard.id, decoy.id]);
-      await usePowerup(powerupId);
+      await consumePowerup(powerupId);
 
       setFeedback({ visible: true, message: "TRUE SIGHT!", type: "info" });
       setTimeout(() => setPeekedCards([]), 1400);
@@ -192,10 +196,12 @@ export default function GameScreen() {
     // --- BIG SHOW ---
     if (powerupId === "big_show") {
       setFreezeActive(true);
-      await usePowerup(powerupId);
+      await consumePowerup(powerupId);
 
       setFeedback({ visible: true, message: "BIG SHOW!", type: "info" });
-      setTimeout(() => setFreezeActive(false), 3000);
+      setTimeout(() => setFreezeActive(false), 2000);
+      setCards(shuffleArray([...cards])); // reshuffle for variety
+      return;
     }
   };
 
@@ -222,7 +228,7 @@ export default function GameScreen() {
           onPress={() => setShowExitConfirm(true)}
           style={styles.menuButton}
         >
-          <Ionicons size={28} color="#e5e7eb" name="menu" />
+          <Ionicons size={28} color="#e5e7eb" name="exit" />
         </TouchableOpacity>
       </View>
 
