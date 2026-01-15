@@ -16,20 +16,20 @@ export default function Card({
   freezeActive = false,
   onPick,
 }) {
-  // 0 = face down, 1 = face up
   const flip = useSharedValue(0);
+  const imageScale = useSharedValue(0.85);
 
   const shouldShowBack = isRevealed || isPeeked || freezeActive;
 
   useEffect(() => {
-    flip.value = withTiming(shouldShowBack ? 1 : 0, {
-      duration: 400,
+    flip.value = withTiming(shouldShowBack ? 1 : 0, { duration: 400 });
+    imageScale.value = withTiming(shouldShowBack ? 1 : 0.85, {
+      duration: 300,
     });
-  }, [shouldShowBack, freezeActive]);
+  }, [shouldShowBack]);
 
   const frontStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(flip.value, [0, 1], [0, 180]);
-
     return {
       transform: [{ perspective: 800 }, { rotateY: `${rotateY}deg` }],
     };
@@ -37,30 +37,33 @@ export default function Card({
 
   const backStyle = useAnimatedStyle(() => {
     const rotateY = interpolate(flip.value, [0, 1], [180, 360]);
-
     return {
       transform: [{ perspective: 800 }, { rotateY: `${rotateY}deg` }],
     };
   });
+
+  const imageStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: imageScale.value }],
+  }));
 
   return (
     <TouchableOpacity
       disabled={isRevealed || isPeeked || freezeActive}
       onPress={() => onPick(card)}
       style={styles.wrapper}
+      activeOpacity={0.9}
     >
-      {/* Front (cover) */}
+      {/* Front */}
       <Animated.View style={[styles.card, styles.front, frontStyle]} />
 
-      {/* Back (content) */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.back,
-          backStyle,
-          { backgroundColor: card.value },
-        ]}
-      />
+      {/* Back */}
+      <Animated.View style={[styles.card, styles.back, backStyle]}>
+        <Animated.Image
+          source={card.image}
+          style={[styles.animal, imageStyle]}
+          resizeMode="contain"
+        />
+      </Animated.View>
     </TouchableOpacity>
   );
 }

@@ -20,7 +20,14 @@ export default StyleSheet.create({
   },
 
   back: {
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#111827", // or transparent if you prefer
+  },
+
+  animal: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
   },
 });

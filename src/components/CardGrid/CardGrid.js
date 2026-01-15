@@ -8,8 +8,8 @@ import Animated, {
 
 import Card from "../Card/Card";
 
-const CARD_SIZE = 126;
-const GAP = -20;
+const CARD_SIZE = 140;
+const GAP = -30;
 
 export default function CardGrid({
   cards,
