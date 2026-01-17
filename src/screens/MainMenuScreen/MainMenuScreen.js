@@ -30,28 +30,28 @@ export default function MainMenuScreen({ navigation }) {
       {/* BUTTONS */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={styles.primaryButton}
+          style={[styles.primaryButton, styles.button]}
           onPress={() => navigation.navigate("Game")}
         >
           <Text style={styles.buttonText}>Play Game</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryButton}
+          style={[styles.secondaryButton, styles.button]}
           onPress={() => navigation.navigate("Shop")}
         >
           <Text style={styles.buttonText}>Shop</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryButton}
+          style={[styles.secondaryButton, styles.button]}
           onPress={() => navigation.navigate("Settings")}
         >
           <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryButton}
+          style={[styles.secondaryButton, styles.button]}
           onPress={() => navigation.navigate("Achievements")}
         >
           <View style={styles.achievementButtonContent}>
@@ -62,7 +62,7 @@ export default function MainMenuScreen({ navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.secondaryButton}
+          style={[styles.secondaryButton, styles.button]}
           onPress={() => navigation.navigate("Stats")}
         >
           <Text style={styles.buttonText}>Stats</Text>

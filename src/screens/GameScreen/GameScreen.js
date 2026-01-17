@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-
+import { View, Text, TouchableOpacity, Image } from "react-native";
+import Colors from "../../constants/colors";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+} from "react-native-reanimated";
 import { useUser } from "../../context/userContext";
 
 import CardGrid from "../../components/CardGrid/CardGrid";
@@ -66,6 +72,19 @@ export default function GameScreen() {
   useEffect(() => {
     startRound();
   }, []);
+
+  const scoreFlash = useSharedValue(0);
+
+  useEffect(() => {
+    scoreFlash.value = withTiming(1, { duration: 120 }, () => {
+      scoreFlash.value = withTiming(0, { duration: 250 });
+    });
+  }, [score]);
+
+  const scoreAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: 1 + scoreFlash.value * 0.15 }],
+    backgroundColor: scoreFlash.value ? "#FFE066" : "#FF4D6D",
+  }));
 
   /* ----------------------------
      ROUND INITIALIZATION
@@ -213,83 +232,121 @@ export default function GameScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Text style={styles.highScore}>High Score: {highScore}</Text>
+    <LinearGradient
+      colors={[
+        Colors.appBackground,
+        Colors.strawberryLight,
+        Colors.surfaceSoft,
+      ]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+        {/* HEADER */}
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            {/* SCORE CARD */}
+            <Animated.View style={[styles.scoreCard, scoreAnimStyle]}>
+              <Text style={styles.scoreValue}>{score}</Text>
+            </Animated.View>
 
-        <View style={styles.headerRight}>
-          <Text style={styles.difficultyBadge}>{difficulty}</Text>
-          <Text style={styles.round}>
-            Round {round} / {TOTAL_ROUNDS}
-          </Text>
+            {/* DIFFICULTY */}
+            <View style={styles.difficultyBadge}>
+              <Text style={styles.difficultyText}>{difficulty}</Text>
+            </View>
+
+            {/* EXIT */}
+            <TouchableOpacity
+              onPress={() => setShowExitConfirm(true)}
+              style={styles.exitButton}
+            >
+              <Ionicons name="exit-outline" size={22} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.headerBottom}>
+            <View style={styles.progressTrack}>
+              <View
+                style={[
+                  styles.progressFill,
+                  { width: `${(round / TOTAL_ROUNDS) * 100}%` },
+                ]}
+              />
+            </View>
+
+            <Text style={styles.roundText}>
+              Round {round} of {TOTAL_ROUNDS}
+            </Text>
+          </View>
         </View>
-        <TouchableOpacity
-          onPress={() => setShowExitConfirm(true)}
-          style={styles.menuButton}
-        >
-          <Ionicons size={28} color="#e5e7eb" name="exit" />
-        </TouchableOpacity>
-      </View>
 
-      {/* TARGET */}
-      {targetCard && (
-        <Text style={styles.targetText}>Pick {targetCard.label}</Text>
-      )}
+        {/* TARGET CARD */}
+        {targetCard && (
+          <View style={styles.targetContainer}>
+            <Text style={styles.targetLabel}>Pick this animal</Text>
 
-      {/* GRID */}
-      <CardGrid
-        cards={cards}
-        isRevealed={isRevealed}
-        peekedCards={peekedCards}
-        freezeActive={freezeActive}
-        onCardPick={handleCardPick}
-      />
+            <View style={styles.targetCard}>
+              <Image
+                source={targetCard.image}
+                style={styles.targetImage}
+                resizeMode="contain"
+              />
+            </View>
 
-      <Feedback
-        visible={feedback.visible}
-        message={feedback.message}
-        type={feedback.type}
-        onHide={() => setFeedback((f) => ({ ...f, visible: false }))}
-      />
+            {/* optional: keep label for accessibility */}
+            <Text style={styles.targetName}>{targetCard.label}</Text>
+          </View>
+        )}
 
-      {/* SCORE */}
-      <Text style={styles.score}>Score: {score}</Text>
+        {/* GRID */}
+        <CardGrid
+          cards={cards}
+          isRevealed={isRevealed}
+          peekedCards={peekedCards}
+          freezeActive={freezeActive}
+          onCardPick={handleCardPick}
+        />
 
-      {/* POWERUPS FOOTER */}
-      <PowerupsFooter
-        inventory={powerups}
-        onUse={handleUsePowerup}
-        disabled={freezeActive || isRevealed}
-      />
+        <Feedback
+          visible={feedback.visible}
+          message={feedback.message}
+          type={feedback.type}
+          onHide={() => setFeedback((f) => ({ ...f, visible: false }))}
+        />
 
-      {/* GAME OVER MODAL */}
-      <GameOverModal
-        visible={showGameOverModal}
-        score={finalScore}
-        highScore={highScore}
-        coinsEarned={coinsEarned}
-        won={gameWon}
-        onRestart={() => {
-          setShowGameOverModal(false);
-          restartGame();
-        }}
-        onExit={() => {
-          setShowGameOverModal(false);
-          navigation.replace("MainMenu");
-        }}
-      />
+        {/* POWERUPS FOOTER */}
+        <PowerupsFooter
+          inventory={powerups}
+          onUse={handleUsePowerup}
+          disabled={freezeActive || isRevealed}
+        />
 
-      {/* EXIT CONFIRMATION */}
-      <ConfirmModal
-        visible={showExitConfirm}
-        title="Exit Game?"
-        message="Your current progress will be lost. Are you sure you want to return to the menu?"
-        confirmText="Exit"
-        cancelText="Stay"
-        onCancel={() => setShowExitConfirm(false)}
-        onConfirm={() => navigation.replace("MainMenu")}
-      />
-    </View>
+        {/* GAME OVER MODAL */}
+        <GameOverModal
+          visible={showGameOverModal}
+          score={finalScore}
+          highScore={highScore}
+          coinsEarned={coinsEarned}
+          won={gameWon}
+          onRestart={() => {
+            setShowGameOverModal(false);
+            restartGame();
+          }}
+          onExit={() => {
+            setShowGameOverModal(false);
+            navigation.replace("MainMenu");
+          }}
+        />
+
+        {/* EXIT CONFIRMATION */}
+        <ConfirmModal
+          visible={showExitConfirm}
+          title="Exit Game?"
+          message="Your current progress will be lost. Are you sure you want to return to the menu?"
+          confirmText="Exit"
+          cancelText="Stay"
+          onCancel={() => setShowExitConfirm(false)}
+          onConfirm={() => navigation.replace("MainMenu")}
+        />
+    </LinearGradient>
   );
 }

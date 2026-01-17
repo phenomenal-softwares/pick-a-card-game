@@ -1,13 +1,18 @@
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   container: {
+    width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 12,
-    backgroundColor: "#020617",
-    borderTopWidth: 1,
-    borderTopColor: "#1f2937",
+    backgroundColor: Colors.strawberryDark,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    elevation: 10,
   },
 
   powerup: {

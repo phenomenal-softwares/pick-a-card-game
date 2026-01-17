@@ -14,7 +14,7 @@ export const POWERUPS = [
   {
     id: "double_peek",
     label: "50/50",
-    description: "Reveal half of the cards briefly",
+    description: "Glance at about half of the cards",
     maxTargets: 2,
     rarity: "rare",
     icon: {

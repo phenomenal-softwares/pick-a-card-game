@@ -53,7 +53,7 @@ export default function PowerupsFooter({ inventory, onUse, disabled }) {
             disabled={isDisabled}
             activeOpacity={0.85}
           >
-            {renderPowerupIcon(p.icon, 26, "#fff")}
+            {renderPowerupIcon(p.icon, 45, "#fff")}
             <Text style={styles.count}>{count}</Text>
           </AnimatedTouchable>
         );

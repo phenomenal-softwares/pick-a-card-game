@@ -1,5 +1,5 @@
-import { startTransition, use } from "react";
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   container: {
@@ -31,15 +31,19 @@ export default StyleSheet.create({
     width: "100%",
     alignItems: "center",
   },
+  button: {
+    width: "80%",
+    alignItems: "center",
+  },
   primaryButton: {
-    backgroundColor: "#2196f3",
+    backgroundColor: Colors.buttonPrimary,
     paddingVertical: 14,
     paddingHorizontal: 50,
     borderRadius: 10,
     marginBottom: 20,
   },
   secondaryButton: {
-    backgroundColor: "#ff9800",
+    backgroundColor: Colors.strawberryDark,
     paddingVertical: 14,
     paddingHorizontal: 50,
     borderRadius: 10,
@@ -49,7 +53,6 @@ export default StyleSheet.create({
     position: "relative",
     alignItems: "center",
   },
-
   redDot: {
     position: "absolute",
     top: -4,
@@ -57,7 +60,7 @@ export default StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#ef4444",
+    backgroundColor: Colors.dangerSoft,
   },
   disabledButton: {
     backgroundColor: "#555",

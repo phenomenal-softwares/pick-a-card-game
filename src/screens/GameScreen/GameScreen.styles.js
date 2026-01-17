@@ -1,107 +1,156 @@
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#0e0e10",
+    alignItems: "center",
   },
 
+  /* ======================
+     HEADER SHELL
+  ====================== */
   header: {
     width: "100%",
+    backgroundColor: Colors.strawberryDark,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
+    elevation: 12,
+    shadowColor: Colors.glowStrawberry,
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+  },
+
+  headerTop: {
     flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
+  },
+
+  /* ======================
+     SCORE CARD
+  ====================== */
+  scoreCard: {
+    minWidth: 64,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: Colors.scoreBg,
+    justifyContent: "center",
     alignItems: "center",
+    shadowColor: Colors.glowStrawberry,
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
 
-  headerRight: {
-    alignItems: "flex-end",
-    gap: 4,
-  },
-
-  highScore: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#b9b5d6ff",
-  },
-
-  round: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#b9b5d6ff",
-  },
-
-  difficultyBadge: {
-    fontSize: 12,
-    fontWeight: "700",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    backgroundColor: "#334155",
-    color: "#e5e7eb",
-  },
-
-  menuButton: {
-    alignSelf: "flex-start",
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#60a5fa",
-    marginTop: 6,
-  },
-
-  powerupButton: {
-    marginTop: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#fef3c7",
-    backgroundColor: "#7c3aed",
-    opacity: 1,
-  },
-
-  powerupButtonActive: {
-    backgroundColor: "#2563eb",
-  },
-
-  powerupButtonDisabled: {
-    backgroundColor: "#374151",
-    color: "#9ca3af",
-    opacity: 0.6,
-  },
-
-  powerupContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-
-  powerupCount: {
-    fontSize: 14,
-    fontWeight: "800",
-    color: "#f9fafb",
-  },
-
-  powerupEmpty: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#6b7280",
-  },
-
-  targetText: {
+  scoreValue: {
     fontSize: 22,
-    fontWeight: "bold",
-    marginVertical: 12,
-    color: "#e0e0e0ff",
+    fontWeight: "900",
+    color: Colors.textOnColor,
   },
 
-  score: {
-    fontSize: 18,
+  /* ======================
+     DIFFICULTY BADGE
+  ====================== */
+  difficultyBadge: {
+    backgroundColor: Colors.surfaceSoft,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+
+  difficultyText: {
+    color: Colors.strawberryDark,
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+  },
+
+  /* ======================
+     EXIT BUTTON
+  ====================== */
+  exitButton: {
+    backgroundColor: Colors.danger,
+    padding: 10,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: Colors.danger,
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+  },
+
+  /* ======================
+     HEADER BOTTOM
+  ====================== */
+  headerBottom: {
+    marginTop: 12,
+    alignItems: "center",
+  },
+
+  /* ======================
+     PROGRESS BAR
+  ====================== */
+  progressTrack: {
+    width: "100%",
+    height: 8,
+    backgroundColor: Colors.progressBg,
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+
+  progressFill: {
+    height: "100%",
+    backgroundColor: Colors.progressFill,
+    borderRadius: 999,
+  },
+
+  roundText: {
+    marginTop: 6,
+    color: Colors.textOnColor,
+    fontSize: 14,
     fontWeight: "600",
-    marginBottom: 10,
-    color: "#a6fe23ff",
+  },
+
+  targetContainer: {
+    alignItems: "center",
+    marginVertical: 16,
+  },
+
+  targetLabel: {
+    color: Colors.textPrimary,
+    fontSize: 14,
+    marginBottom: 6,
+    letterSpacing: 0.5,
+  },
+
+  targetCard: {
+    width: 90,
+    height: 90,
+    borderRadius: 14,
+    backgroundColor: Colors.strawberry,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+
+  targetImage: {
+    width: "90%",
+    height: "90%",
+    borderRadius: 12,
+  },
+
+  targetName: {
+    color: Colors.textPrimary,
+    fontSize: 13,
+    fontWeight: "800",
+    opacity: 0.8,
   },
 });

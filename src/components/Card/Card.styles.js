@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   wrapper: {
@@ -16,13 +17,13 @@ export default StyleSheet.create({
   },
 
   front: {
-    backgroundColor: "#2c3e50",
+    backgroundColor: Colors.strawberryDark,
   },
 
   back: {
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#111827", // or transparent if you prefer
+    backgroundColor: Colors.cardBack,
   },
 
   animal: {

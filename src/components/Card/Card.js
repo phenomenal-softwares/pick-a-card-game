@@ -54,7 +54,13 @@ export default function Card({
       activeOpacity={0.9}
     >
       {/* Front */}
-      <Animated.View style={[styles.card, styles.front, frontStyle]} />
+      <Animated.View style={[styles.card, styles.front, frontStyle]}>
+        <Animated.Image
+          source={require("../../../assets/card/card-back.png")}
+          style={[styles.animal, imageStyle]}
+          resizeMode="contain"
+        />
+      </Animated.View>
 
       {/* Back */}
       <Animated.View style={[styles.card, styles.back, backStyle]}>
