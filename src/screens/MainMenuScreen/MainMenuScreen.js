@@ -1,9 +1,12 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { useUser } from "../../context/userContext";
+import { useSound } from "../../context/soundContext";
+import { playSound } from "../../utils/soundManager";
 import styles from "./MainMenuScreen.styles";
 
 export default function MainMenuScreen({ navigation }) {
   const { user, loading } = useUser();
+  const { soundsEnabled } = useSound();
 
   if (loading || !user) return null; // wait until user data is loaded
 
@@ -31,28 +34,48 @@ export default function MainMenuScreen({ navigation }) {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.primaryButton, styles.button]}
-          onPress={() => navigation.navigate("Game")}
+          onPress={() => {
+            if (soundsEnabled) {
+              playSound("button");
+            }
+            navigation.navigate("Game");
+          }}
         >
           <Text style={styles.buttonText}>Play Game</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.secondaryButton, styles.button]}
-          onPress={() => navigation.navigate("Shop")}
+          onPress={() => {
+            if (soundsEnabled) {
+              playSound("button");
+            }
+            navigation.navigate("Shop");
+          }}
         >
           <Text style={styles.buttonText}>Shop</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.secondaryButton, styles.button]}
-          onPress={() => navigation.navigate("Settings")}
+          onPress={() => {
+            if (soundsEnabled) {
+              playSound("button");
+            }
+            navigation.navigate("Settings");
+          }}
         >
           <Text style={styles.buttonText}>Settings</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.secondaryButton, styles.button]}
-          onPress={() => navigation.navigate("Achievements")}
+          onPress={() => {
+            if (soundsEnabled) {
+              playSound("button");
+            }
+            navigation.navigate("Achievements");
+          }}
         >
           <View style={styles.achievementButtonContent}>
             <Text style={styles.buttonText}>Achievements</Text>
@@ -63,7 +86,12 @@ export default function MainMenuScreen({ navigation }) {
 
         <TouchableOpacity
           style={[styles.secondaryButton, styles.button]}
-          onPress={() => navigation.navigate("Stats")}
+          onPress={() => {
+            if (soundsEnabled) {
+              playSound("button");
+            }
+            navigation.navigate("Stats");
+          }}
         >
           <Text style={styles.buttonText}>Stats</Text>
         </TouchableOpacity>

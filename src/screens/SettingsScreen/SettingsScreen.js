@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 import AppHeader from "../../components/AppHeader/AppHeader";
 import { useNavigation } from "@react-navigation/native";
 
 import { useUser } from "../../context/userContext";
+import { useSound } from "../../context/soundContext";
+import {
+  unlockAndPlayMusic,
+  stopMusic,
+  playSound,
+} from "../../utils/soundManager";
 import styles from "./SettingsScreen.styles";
 
 const DIFFICULTIES = ["EASY", "MEDIUM", "HARD"];
@@ -16,7 +22,7 @@ export default function SettingsScreen() {
   const [showDiffConfirm, setShowDiffConfirm] = useState(false);
   const [pendingDifficulty, setPendingDifficulty] = useState(null);
 
-  const [soundsEnabled, setSoundsEnabled] = useState(true);
+  const { soundsEnabled, setSoundsEnabled } = useSound();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   if (!user) return null; // Wait until context loads
@@ -32,14 +38,14 @@ export default function SettingsScreen() {
     setShowDiffConfirm(false);
     if (!pendingDifficulty) return;
 
-    await changeDifficulty(pendingDifficulty); // ✅ context function
+    await changeDifficulty(pendingDifficulty);
     setPendingDifficulty(null);
   };
 
   /* ---------- HANDLE DELETE DATA ---------- */
   const confirmDeleteData = async () => {
     setShowDeleteConfirm(false);
-    await hardReset(); // ✅ context function resets storage & state
+    await hardReset();
   };
 
   return (
@@ -56,10 +62,18 @@ export default function SettingsScreen() {
               return (
                 <TouchableOpacity
                   key={level}
-                  style={[styles.optionButton, active && styles.optionButtonActive]}
+                  style={[
+                    styles.optionButton,
+                    active && styles.optionButtonActive,
+                  ]}
                   onPress={() => handleDifficultyChange(level)}
                 >
-                  <Text style={[styles.optionText, active && styles.optionTextActive]}>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      active && styles.optionTextActive,
+                    ]}
+                  >
                     {level}
                   </Text>
                 </TouchableOpacity>
@@ -73,19 +87,44 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>Game Sounds</Text>
           <View style={styles.row}>
             <TouchableOpacity
-              style={[styles.optionButton, soundsEnabled && styles.optionButtonActive]}
-              onPress={() => setSoundsEnabled(true)}
+              style={[
+                styles.optionButton,
+                soundsEnabled && styles.optionButtonActive,
+              ]}
+              onPress={async () => {
+                playSound("button");
+
+                // explicitly unlock and play music inside the user gesture
+                if (!soundsEnabled) {
+                  await unlockAndPlayMusic();
+                }
+
+                setSoundsEnabled(true);
+              }}
             >
-              <Text style={[styles.optionText, soundsEnabled && styles.optionTextActive]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  soundsEnabled && styles.optionTextActive,
+                ]}
+              >
                 ON
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.optionButton, !soundsEnabled && styles.optionButtonActive]}
+              style={[
+                styles.optionButton,
+                !soundsEnabled && styles.optionButtonActive,
+              ]}
               onPress={() => setSoundsEnabled(false)}
             >
-              <Text style={[styles.optionText, !soundsEnabled && styles.optionTextActive]}>
+              <Text
+                style={[
+                  styles.optionText,
+                  !soundsEnabled && styles.optionTextActive,
+                ]}
+              >
                 OFF
               </Text>
             </TouchableOpacity>

@@ -7,6 +7,8 @@ import Animated, {
   withTiming,
   useAnimatedStyle,
 } from "react-native-reanimated";
+import { useSound } from "../../context/soundContext";
+import { playSound } from "../../utils/soundManager";
 import { useUser } from "../../context/userContext";
 
 import CardGrid from "../../components/CardGrid/CardGrid";
@@ -29,6 +31,7 @@ const TOTAL_ROUNDS = 10;
 
 export default function GameScreen() {
   const { user, applyGameResult, consumePowerup } = useUser();
+  const { soundsEnabled } = useSound();
 
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
@@ -122,8 +125,10 @@ export default function GameScreen() {
 
     if (isCorrect) {
       setScore(updatedScore);
+      soundsEnabled && playSound("correct");
       setFeedback({ visible: true, message: "Correct!", type: "success" });
     } else {
+      soundsEnabled && playSound("gameOver");
       setFeedback({ visible: true, message: "Wrong!", type: "error" });
     }
 
@@ -145,7 +150,7 @@ export default function GameScreen() {
         try {
           const { updatedUser, coinsEarned, unlockedAchievements } =
             await applyGameResult(result);
-
+          soundsEnabled && playSound(won ? "gameWin" : "gameOver");
           // UI STATE ONLY
           setFinalScore(updatedScore);
           setCoinsEarned(coinsEarned);
@@ -170,6 +175,7 @@ export default function GameScreen() {
 
     if (available <= 0 || isRevealed || peekedCards.length > 0) return;
 
+    soundsEnabled && playSound("powerup");
     // --- PEEK / DOUBLE PEEK ---
     if (powerupId === "peek" || powerupId === "double_peek") {
       const pool = CARD_POOLS[difficulty];
@@ -242,111 +248,122 @@ export default function GameScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-        {/* HEADER */}
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            {/* SCORE CARD */}
-            <Animated.View style={[styles.scoreCard, scoreAnimStyle]}>
-              <Text style={styles.scoreValue}>{score}</Text>
-            </Animated.View>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          {/* SCORE CARD */}
+          <Animated.View style={[styles.scoreCard, scoreAnimStyle]}>
+            <Text style={styles.scoreValue}>{score}</Text>
+          </Animated.View>
 
-            {/* DIFFICULTY */}
-            <View style={styles.difficultyBadge}>
-              <Text style={styles.difficultyText}>{difficulty}</Text>
-            </View>
-
-            {/* EXIT */}
-            <TouchableOpacity
-              onPress={() => setShowExitConfirm(true)}
-              style={styles.exitButton}
-            >
-              <Ionicons name="exit-outline" size={22} color="#fff" />
-            </TouchableOpacity>
+          {/* DIFFICULTY */}
+          <View style={styles.difficultyBadge}>
+            <Text style={styles.difficultyText}>{difficulty}</Text>
           </View>
-          <View style={styles.headerBottom}>
-            <View style={styles.progressTrack}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${(round / TOTAL_ROUNDS) * 100}%` },
-                ]}
-              />
-            </View>
 
-            <Text style={styles.roundText}>
-              Round {round} of {TOTAL_ROUNDS}
-            </Text>
-          </View>
+          {/* EXIT */}
+          <TouchableOpacity
+            onPress={() => {
+              soundsEnabled && playSound("button");
+              setShowExitConfirm(true);
+            }}
+            style={styles.exitButton}
+          >
+            <Ionicons name="exit-outline" size={22} color="#fff" />
+          </TouchableOpacity>
         </View>
-
-        {/* TARGET CARD */}
-        {targetCard && (
-          <View style={styles.targetContainer}>
-            <Text style={styles.targetLabel}>Pick this animal</Text>
-
-            <View style={styles.targetCard}>
-              <Image
-                source={targetCard.image}
-                style={styles.targetImage}
-                resizeMode="contain"
-              />
-            </View>
-
-            {/* optional: keep label for accessibility */}
-            <Text style={styles.targetName}>{targetCard.label}</Text>
+        <View style={styles.headerBottom}>
+          <View style={styles.progressTrack}>
+            <View
+              style={[
+                styles.progressFill,
+                { width: `${(round / TOTAL_ROUNDS) * 100}%` },
+              ]}
+            />
           </View>
-        )}
 
-        {/* GRID */}
-        <CardGrid
-          cards={cards}
-          isRevealed={isRevealed}
-          peekedCards={peekedCards}
-          freezeActive={freezeActive}
-          onCardPick={handleCardPick}
-        />
+          <Text style={styles.roundText}>
+            Round {round} of {TOTAL_ROUNDS}
+          </Text>
+        </View>
+      </View>
 
-        <Feedback
-          visible={feedback.visible}
-          message={feedback.message}
-          type={feedback.type}
-          onHide={() => setFeedback((f) => ({ ...f, visible: false }))}
-        />
+      {/* TARGET CARD */}
+      {targetCard && (
+        <View style={styles.targetContainer}>
+          <Text style={styles.targetLabel}>Pick this animal</Text>
 
-        {/* POWERUPS FOOTER */}
-        <PowerupsFooter
-          inventory={powerups}
-          onUse={handleUsePowerup}
-          disabled={freezeActive || isRevealed}
-        />
+          <View style={styles.targetCard}>
+            <Image
+              source={targetCard.image}
+              style={styles.targetImage}
+              resizeMode="contain"
+            />
+          </View>
 
-        {/* GAME OVER MODAL */}
-        <GameOverModal
-          visible={showGameOverModal}
-          score={finalScore}
-          highScore={highScore}
-          coinsEarned={coinsEarned}
-          won={gameWon}
-          onRestart={() => {
-            setShowGameOverModal(false);
-            restartGame();
-          }}
-          onExit={() => {
-            setShowGameOverModal(false);
-            navigation.replace("MainMenu");
-          }}
-        />
+          {/* optional: keep label for accessibility */}
+          <Text style={styles.targetName}>{targetCard.label}</Text>
+        </View>
+      )}
 
-        {/* EXIT CONFIRMATION */}
-        <ConfirmModal
-          visible={showExitConfirm}
-          title="Exit Game?"
-          message="Your current progress will be lost. Are you sure you want to return to the menu?"
-          confirmText="Exit"
-          cancelText="Stay"
-          onCancel={() => setShowExitConfirm(false)}
-          onConfirm={() => navigation.replace("MainMenu")}
-        />
+      {/* GRID */}
+      <CardGrid
+        cards={cards}
+        isRevealed={isRevealed}
+        peekedCards={peekedCards}
+        freezeActive={freezeActive}
+        onCardPick={handleCardPick}
+      />
+
+      <Feedback
+        visible={feedback.visible}
+        message={feedback.message}
+        type={feedback.type}
+        onHide={() => setFeedback((f) => ({ ...f, visible: false }))}
+      />
+
+      {/* POWERUPS FOOTER */}
+      <PowerupsFooter
+        inventory={powerups}
+        onUse={handleUsePowerup}
+        disabled={freezeActive || isRevealed}
+      />
+
+      {/* GAME OVER MODAL */}
+      <GameOverModal
+        visible={showGameOverModal}
+        score={finalScore}
+        highScore={highScore}
+        coinsEarned={coinsEarned}
+        won={gameWon}
+        onRestart={() => {
+          soundsEnabled && playSound("button");
+          setShowGameOverModal(false);
+          restartGame();
+        }}
+        onExit={() => {
+          soundsEnabled && playSound("button");
+          setShowGameOverModal(false);
+          navigation.replace("MainMenu");
+        }}
+      />
+
+      {/* EXIT CONFIRMATION */}
+      <ConfirmModal
+        visible={showExitConfirm}
+        title="Exit Game?"
+        message="Your current progress will be lost. Are you sure you want to return to the menu?"
+        confirmText="Exit"
+        cancelText="Stay"
+        onCancel={() => {
+          soundsEnabled && playSound("button");
+          setShowExitConfirm(false);
+        }}
+        onConfirm={() => {
+          soundsEnabled && playSound("button");
+          navigation.replace("MainMenu");
+        }}
+      />
     </LinearGradient>
   );
 }
