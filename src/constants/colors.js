@@ -12,10 +12,10 @@ const Colors = {
   /* =========================
      BACKGROUNDS (BRIGHT)
   ========================== */
-  appBackground: "#FFF1F5", // Light pink canvas
-  surface: "#FFFFFF", // Cards, panels
-  surfaceSoft: "#FFE4EC", // Subtle sections
-  surfaceAlt: "#FFF7FA",
+  appBackground: "#FBD1C7",
+  surface: "#C1BB41",
+  surfaceSoft: "#FFE4EC",
+  surfaceAlt: "#E0653B",
 
   /* =========================
      TEXT

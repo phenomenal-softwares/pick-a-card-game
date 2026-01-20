@@ -13,7 +13,7 @@ export default StyleSheet.create({
   ====================== */
   header: {
     width: "100%",
-    backgroundColor: Colors.strawberryDark,
+    backgroundColor: Colors.surfaceAlt,
     paddingHorizontal: 16,
     paddingTop: 14,
     paddingBottom: 14,

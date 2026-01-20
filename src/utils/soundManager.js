@@ -14,6 +14,7 @@ export const loadAllSounds = async () => {
   sounds.button = new Audio.Sound();
   sounds.powerup = new Audio.Sound();
   sounds.correct = new Audio.Sound();
+  sounds.wrong = new Audio.Sound();
   sounds.gameWin = new Audio.Sound();
   sounds.gameOver = new Audio.Sound();
 
@@ -27,6 +28,7 @@ export const loadAllSounds = async () => {
     sounds.button.loadAsync(require("../../assets/sounds/button-press.mp3")),
     sounds.powerup.loadAsync(require("../../assets/sounds/power-up.mp3")),
     sounds.correct.loadAsync(require("../../assets/sounds/correct.mp3")),
+    sounds.wrong.loadAsync(require("../../assets/sounds/wrong.mp3")),
     sounds.gameWin.loadAsync(require("../../assets/sounds/game-win.mp3")),
     sounds.gameOver.loadAsync(require("../../assets/sounds/game-over.mp3")),
   ]);

@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import Colors, { colors } from "../../constants/colors";
 
 export default StyleSheet.create({
   overlay: {
@@ -10,7 +11,7 @@ export default StyleSheet.create({
 
   container: {
     width: "80%",
-    backgroundColor: "#111827",
+    backgroundColor: Colors.surfaceAlt,
     borderRadius: 14,
     padding: 20,
   },
@@ -41,15 +42,15 @@ export default StyleSheet.create({
   },
 
   cancel: {
-    backgroundColor: "#374151",
+    backgroundColor: Colors.surface,
   },
 
   confirm: {
-    backgroundColor: "#ef4444",
+    backgroundColor: Colors.danger,
   },
 
   buttonText: {
-    color: "#f9fafb",
+    color: "#ffffff",
     fontWeight: "600",
   },
 });

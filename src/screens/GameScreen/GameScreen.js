@@ -128,7 +128,7 @@ export default function GameScreen() {
       soundsEnabled && playSound("correct");
       setFeedback({ visible: true, message: "Correct!", type: "success" });
     } else {
-      soundsEnabled && playSound("gameOver");
+      soundsEnabled && playSound("wrong");
       setFeedback({ visible: true, message: "Wrong!", type: "error" });
     }
 
@@ -282,9 +282,7 @@ export default function GameScreen() {
             />
           </View>
 
-          <Text style={styles.roundText}>
-            Round {round} of {TOTAL_ROUNDS}
-          </Text>
+     
         </View>
       </View>
 

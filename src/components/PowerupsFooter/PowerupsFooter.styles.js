@@ -6,7 +6,7 @@ export default StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: Colors.strawberryDark,
+    backgroundColor: Colors.surface,
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 14,
@@ -33,6 +33,6 @@ export default StyleSheet.create({
     right: 8,
     fontSize: 12,
     fontWeight: "800",
-    color: "#fff",
+    color: Colors.white,
   },
 });
