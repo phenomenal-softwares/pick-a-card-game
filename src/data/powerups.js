@@ -48,3 +48,7 @@ export const POWERUPS = [
     price: 500,
   },
 ];
+
+export const POWERUP_MAP = Object.fromEntries(
+  POWERUPS.map(p => [p.id, p])
+);

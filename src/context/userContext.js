@@ -36,15 +36,7 @@ export const UserProvider = ({ children }) => {
     const claimed = user.claimedAchievements ?? [];
     if (claimed.includes(achievement.id)) return;
 
-    // clone existing powerups
     const updatedPowerups = { ...(user.powerups || {}) };
-
-    // add powerups rewards
-    if (achievement.reward.powerups?.length) {
-      achievement.reward.powerups.forEach((id) => {
-        updatedPowerups[id] = (updatedPowerups[id] || 0) + 1;
-      });
-    }
 
     const updatedUser = {
       ...user,
@@ -52,6 +44,12 @@ export const UserProvider = ({ children }) => {
       powerups: updatedPowerups,
       claimedAchievements: [...claimed, achievement.id],
     };
+
+    if (achievement.reward.powerups?.length) {
+      achievement.reward.powerups.forEach(({ id, qty }) => {
+        updatedUser.powerups[id] = (updatedUser.powerups[id] || 0) + qty;
+      });
+    }
 
     await saveUserData(updatedUser);
     setUser(updatedUser);

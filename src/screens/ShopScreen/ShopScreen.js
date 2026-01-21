@@ -9,6 +9,9 @@ import AppHeader from "../../components/AppHeader/AppHeader";
 import Feedback from "../../components/Feedback/Feedback";
 import styles from "./ShopScreen.styles";
 
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Colors from "../../constants/colors";
+
 export default function ShopScreen() {
   const { user, addPowerups } = useUser();
   const navigation = useNavigation();
@@ -44,7 +47,7 @@ export default function ShopScreen() {
       >
         {/* ICON */}
         <View style={styles.iconWrapper}>
-          {renderPowerupIcon(item.icon, 26, "#fff")}
+          {renderPowerupIcon(item.icon, 32, "#fff")}
         </View>
 
         {/* INFO */}
@@ -54,20 +57,29 @@ export default function ShopScreen() {
 
           <View style={styles.metaRow}>
             <Text style={styles.count}>Owned: {ownedCount}</Text>
-            <Text
-              style={[
-                styles.price,
-                user.coins < (item.price ?? 10) && styles.priceInsufficient,
-              ]}
-            >
-              {item.price ?? 10} coins
-            </Text>
+            <View style={styles.priceRow}>
+              <MaterialCommunityIcons
+                name="crown-circle"
+                size={24}
+                color={
+                  user.coins > item.price ? Colors.coin : Colors.dangerSoft
+                }
+              />
+              <Text
+                style={[
+                  styles.price,
+                  user.coins < (item.price ?? 10) && styles.priceInsufficient,
+                ]}
+              >
+                {item.price ?? 10}
+              </Text>
+            </View>
           </View>
         </View>
 
         {/* BUY BUTTON */}
         <TouchableOpacity
-          style={styles.buyButton}
+          style={[styles.buyButton, user.coins < (item.price ?? 10) && { opacity: 0.6 }]}
           activeOpacity={0.85}
           onPress={() => handlePurchase(item)}
         >
@@ -92,8 +104,14 @@ export default function ShopScreen() {
         <MotiView
           from={{ opacity: 0, translateY: -10 }}
           animate={{ opacity: 1, translateY: 0 }}
+          style={styles.coinsRow}
         >
-          <Text style={styles.coins}>🪙 {user.coins} coins</Text>
+          <MaterialCommunityIcons
+            name="crown-circle"
+            size={24}
+            color={Colors.coin}
+          />
+          <Text style={styles.coins}> {user.coins} coins</Text>
         </MotiView>
 
         {/* LIST */}

@@ -1,18 +1,25 @@
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#111827",
+    backgroundColor: Colors.strawberryDark,
+  },
+
+  coinsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
   },
 
   coins: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#facc15",
+    color: Colors.coin,
     textAlign: "center",
-    marginBottom: 18,
   },
 
   listContent: {
@@ -22,11 +29,10 @@ export default StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#1f2937",
+    backgroundColor: Colors.glowStrawberry,
     padding: 16,
     borderRadius: 18,
     marginBottom: 14,
-
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
@@ -38,7 +44,7 @@ export default StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 14,
-    backgroundColor: "#374151",
+    backgroundColor: Colors.strawberry,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 14,
@@ -57,7 +63,7 @@ export default StyleSheet.create({
   },
 
   description: {
-    color: "#d1d5db",
+    color: Colors.strawberrySoft,
     fontSize: 13,
     lineHeight: 18,
     marginBottom: 6,
@@ -70,22 +76,27 @@ export default StyleSheet.create({
   },
 
   count: {
-    color: "#9ca3af",
+    color: Colors.textPrimary,
     fontSize: 13,
   },
 
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
   price: {
-    color: "#60a5fa",
+    color: Colors.coin,
     fontSize: 14,
     fontWeight: "700",
   },
 
   priceInsufficient: {
-    color: "#ef4444", // red-500
+    color: Colors.dangerSoft,
   },
 
   buyButton: {
-    backgroundColor: "#22c55e",
+    backgroundColor: Colors.strawberryGreen,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 14,
@@ -93,7 +104,7 @@ export default StyleSheet.create({
   },
 
   buyText: {
-    color: "#f9fafb",
+    color: Colors.textSecondary,
     fontWeight: "800",
     fontSize: 14,
   },
