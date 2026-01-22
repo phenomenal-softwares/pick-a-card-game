@@ -147,10 +147,10 @@ export default function AchievementsScreen() {
         visible={!!selected}
         title="Claim Reward"
         message="Do you want to claim this achievement reward?"
-        confirmText="Claim"
-        cancelText="Cancel"
-        onCancel={() => setSelected(null)}
-        onConfirm={() => {
+        confirmText="Cancel"
+        cancelText="Claim"
+        onConfirm={() => setSelected(null)}
+        onCancel={() => {
           claimAchievement(selected);
           setSelected(null);
         }}

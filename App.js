@@ -9,6 +9,7 @@ import AchievementsScreen from "./src/screens/AchievementsScreen/AchievementsScr
 import StatsScreen from "./src/screens/StatsScreen/StatsScreen";
 import ShopScreen from "./src/screens/ShopScreen/ShopScreen";
 import LoadingScreen from "./src/screens/LoadingScreen/LoadingScreen";
+import ExtrasScreen from "./src/screens/ExtrasScreen/ExtrasScreen";
 
 import { UserProvider, useUser } from "./src/context/userContext";
 import { SoundProvider } from "./src/context/soundContext";
@@ -53,6 +54,7 @@ export default function App() {
               />
               <Stack.Screen name="Stats" component={StatsScreen} />
               <Stack.Screen name="Shop" component={ShopScreen} />
+              <Stack.Screen name="Extras" component={ExtrasScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </AppLoader>

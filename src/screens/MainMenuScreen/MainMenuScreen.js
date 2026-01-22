@@ -122,7 +122,7 @@ function MenuTile({ label, icon, onPress, primary, badge }) {
           primary && styles.tilePrimary,
         ]}
         onPress={onPress}
-        activeOpacity={0.85}
+        activeOpacity={0.55}
       >
         <Ionicons
           name={icon}

@@ -1,15 +1,16 @@
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0e0e10",
+    backgroundColor: Colors.strawberryDark,
   },
 
   section: {
     marginBottom: 28,
-    backgroundColor: "#16161a",
+    backgroundColor: Colors.strawberry,
     borderRadius: 12,
     padding: 16,
   },
@@ -17,7 +18,7 @@ export default StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#e5e7eb",
+    color: Colors.strawberrySoft,
     marginBottom: 12,
   },
 
@@ -26,12 +27,12 @@ export default StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: "#262626",
+    borderBottomColor: Colors.strawberryGreenDark,
   },
 
   label: {
     fontSize: 14,
-    color: "#9ca3af",
+    color: Colors.strawberrySoft,
   },
 
   value: {

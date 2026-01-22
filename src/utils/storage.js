@@ -135,8 +135,8 @@ export const processGameResult = async (userData, result) => {
   }
 
   // ---- Coins
-  let coinsEarned = correct * 2;
-  if (won) coinsEarned += 10;
+  let coinsEarned = correct * 20;
+  if (won) coinsEarned += 50;
   updatedUser.coins += coinsEarned;
 
   // ---- Achievements

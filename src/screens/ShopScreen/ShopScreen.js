@@ -7,6 +7,10 @@ import { renderPowerupIcon } from "../../utils/renderPowerupIcon";
 import { useNavigation } from "@react-navigation/native";
 import AppHeader from "../../components/AppHeader/AppHeader";
 import Feedback from "../../components/Feedback/Feedback";
+
+import { useSound } from "../../context/soundContext";
+import { playSound } from "../../utils/soundManager";
+
 import styles from "./ShopScreen.styles";
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,6 +19,7 @@ import Colors from "../../constants/colors";
 export default function ShopScreen() {
   const { user, addPowerups } = useUser();
   const navigation = useNavigation();
+  const { soundsEnabled } = useSound();
 
   const [feedback, setFeedback] = useState({
     visible: false,
@@ -27,10 +32,11 @@ export default function ShopScreen() {
   const handlePurchase = async (powerup) => {
     const cost = powerup.price || 10;
     const res = await addPowerups({ [powerup.id]: 1 }, cost);
+    if (soundsEnabled) playSound(res.success ? "correct" : "wrong");
 
     setFeedback({
       visible: true,
-      message: res.success ? `Bought 1 ${powerup.label}!` : res.message,
+      message: res.success ? `${powerup.label} Purchased!` : res.message,
       type: res.success ? "success" : "error",
     });
   };

@@ -1,4 +1,4 @@
-import { TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -47,11 +47,13 @@ export default function Card({
   }));
 
   return (
-    <TouchableOpacity
+    <Pressable
       disabled={isRevealed || isPeeked || freezeActive}
       onPress={() => onPick(card)}
-      style={styles.wrapper}
-      activeOpacity={0.9}
+      style={({ pressed }) => [
+        styles.wrapper,
+        pressed && !isRevealed && !isPeeked && styles.pressed,
+      ]}
     >
       {/* Front */}
       <Animated.View style={[styles.card, styles.front, frontStyle]}>
@@ -70,6 +72,6 @@ export default function Card({
           resizeMode="contain"
         />
       </Animated.View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }

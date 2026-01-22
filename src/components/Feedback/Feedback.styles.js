@@ -13,24 +13,28 @@ export default StyleSheet.create({
   },
 
   text: {
-    color: "#fff",
-    fontSize: 14,
+    fontFamily: "FeedbackFont",
+    textAlign: "center",
+    textShadowColor: "#fff",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 4,
+    fontSize: 32,
     fontWeight: "600",
   },
 
   info: {
-    backgroundColor: "#3b82f6",
+    color: "#1a53ae",
   },
 
   success: {
-    backgroundColor: "#22c55e",
+    color: "#169a47",
   },
 
   error: {
-    backgroundColor: "#ef4444",
+    color: "#8f0909",
   },
 
   warning: {
-    backgroundColor: "#f59e0b",
+    color: "#f59e0b",
   },
 });

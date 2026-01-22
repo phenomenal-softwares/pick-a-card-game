@@ -14,6 +14,11 @@ export default StyleSheet.create({
     height: "100%",
     borderRadius: 12,
     backfaceVisibility: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 10,
   },
 
   front: {
@@ -31,4 +36,9 @@ export default StyleSheet.create({
     height: "100%",
     borderRadius: 12,
   },
+
+  pressed: {
+  transform: [{ scale: 0.66 }],
+  opacity: 0.85,
+},
 });

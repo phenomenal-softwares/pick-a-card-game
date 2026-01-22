@@ -1,7 +1,7 @@
+import { useEffect, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import * as Font from "expo-font";
 import { Asset } from "expo-asset";
-import { useEffect, useState } from "react";
 import styles from "./LoadingScreen.styles";
 import { unlockAndPlayMusic, playSound } from "../../utils/soundManager";
 
@@ -33,6 +33,7 @@ export default function LoadingScreen({ onFinish }) {
 
       await Font.loadAsync({
         GameFont: require("../../../assets/fonts/GloriaHallelujah-Regular.ttf"),
+        FeedbackFont: require("../../../assets/fonts/Winter-Tosca.ttf"),
       });
       loaded++;
       setProgress(loaded / total);

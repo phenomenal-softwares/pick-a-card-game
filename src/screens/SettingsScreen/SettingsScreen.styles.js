@@ -1,9 +1,10 @@
 import { StyleSheet } from "react-native";
+import Colors from "../../constants/colors";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0e0e10",
+    backgroundColor: Colors.strawberryDark,
     padding: 20,
   },
 
@@ -12,7 +13,7 @@ export default StyleSheet.create({
   },
 
   sectionTitle: {
-    color: "#9ca3af",
+    color: Colors.strawberrySoft,
     fontSize: 15,
     marginBottom: 10,
     fontWeight: "600",
@@ -29,17 +30,17 @@ export default StyleSheet.create({
     paddingHorizontal: 22,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#374151",
-    backgroundColor: "#111827",
+    borderColor: Colors.strawberryGreenDark,
+    backgroundColor: Colors.strawberry,
   },
 
   optionButtonActive: {
-    backgroundColor: "#4caf50",
-    borderColor: "#4caf50",
+    backgroundColor: Colors.strawberryGreenDark,
+    borderColor: Colors.strawberryGreen,
   },
 
   optionText: {
-    color: "#d1d5db",
+    color: Colors.textOnColor,
     fontSize: 15,
     fontWeight: "600",
   },
