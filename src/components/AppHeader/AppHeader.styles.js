@@ -34,6 +34,7 @@ export default StyleSheet.create({
 
   title: {
     flex: 1,
+    fontFamily: "GameFont",
     textAlign: "center",
     fontSize: 22,
     fontWeight: "700",

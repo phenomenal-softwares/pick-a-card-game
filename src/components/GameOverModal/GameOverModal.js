@@ -1,4 +1,6 @@
 import { Modal, View, Text, TouchableOpacity } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Colors from "../../constants/colors";
 import styles from "./GameOverModal.styles";
 
 export default function GameOverModal({
@@ -16,10 +18,7 @@ export default function GameOverModal({
         <View style={styles.container}>
           {/* RESULT */}
           <Text
-            style={[
-              styles.resultText,
-              won ? styles.winText : styles.loseText,
-            ]}
+            style={[styles.resultText, won ? styles.winText : styles.loseText]}
           >
             {won ? "You Won!" : "You Lost"}
           </Text>
@@ -33,13 +32,25 @@ export default function GameOverModal({
           {/* REWARD */}
           <View style={styles.rewardBox}>
             <Text style={styles.rewardLabel}>Coins Earned</Text>
-            <Text style={styles.rewardValue}>+{coinsEarned}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 4,
+                gap: 6,
+              }}
+            >
+              <MaterialCommunityIcons
+                name="crown-circle"
+                size={24}
+                color={Colors.coin}
+              />
+              <Text style={styles.rewardValue}>{coinsEarned}</Text>
+            </View>
           </View>
 
           {/* HIGH SCORE */}
-          <Text style={styles.highScoreText}>
-            High Score: {highScore}
-          </Text>
+          <Text style={styles.highScoreText}>High Score: {highScore}</Text>
 
           {/* ACTIONS */}
           <View style={styles.actions}>

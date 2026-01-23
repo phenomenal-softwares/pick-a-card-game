@@ -46,6 +46,7 @@ export default StyleSheet.create({
 
   coinAmount: {
     color: Colors.coin,
+    fontFamily: "GameFont",
     fontSize: 16,
     fontWeight: "bold",
     marginHorizontal: 4,
@@ -65,6 +66,7 @@ export default StyleSheet.create({
   },
 
   powerupQty: {
+    fontFamily: "GameFont",
     fontSize: 16,
     color: Colors.surface,
     fontWeight: "bold",
@@ -86,6 +88,7 @@ export default StyleSheet.create({
   },
 
   title: {
+    fontFamily: "GameFont",
     fontSize: 16,
     fontWeight: "bold",
     color: Colors.textOnColor,
@@ -93,6 +96,7 @@ export default StyleSheet.create({
   },
 
   description: {
+    fontFamily: "GameFont",
     textAlign: "center",
     marginTop: 6,
     fontSize: 13,
@@ -123,6 +127,7 @@ export default StyleSheet.create({
   },
 
   actionText: {
+    fontFamily: "GameFont",
     color: Colors.textOnColor,
     fontSize: 13,
     fontWeight: "600",
@@ -139,6 +144,7 @@ export default StyleSheet.create({
   },
 
   claimedText: {
+    fontFamily: "GameFont",
     color: Colors.textOnColor,
     fontSize: 13,
     fontWeight: "600",

@@ -14,13 +14,13 @@ const DEFAULT_USER_DATA = {
     HARD: 0,
   },
 
-  coins: 0,
+  coins: 1000,
 
   powerups: {
-    peek: 2,
-    double_peek: 1,
-    big_show: 0,
-    true_sight: 1,
+    peek: 5,
+    double_peek: 5,
+    big_show: 5,
+    true_sight: 5,
   },
 
   stats: {

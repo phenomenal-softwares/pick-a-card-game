@@ -49,6 +49,7 @@ export default StyleSheet.create({
   },
 
   scoreValue: {
+    fontFamily: "GameFont",
     fontSize: 22,
     fontWeight: "900",
     color: Colors.textOnColor,
@@ -66,6 +67,7 @@ export default StyleSheet.create({
 
   difficultyText: {
     color: Colors.strawberryDark,
+    fontFamily: "GameFont",
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 0.5,
@@ -115,6 +117,7 @@ export default StyleSheet.create({
   roundText: {
     marginTop: 6,
     color: Colors.textOnColor,
+    fontFamily: "GameFont",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -126,6 +129,7 @@ export default StyleSheet.create({
 
   targetLabel: {
     color: Colors.textPrimary,
+    fontFamily: "GameFont",
     fontSize: 14,
     marginBottom: 6,
     letterSpacing: 0.5,
@@ -148,8 +152,9 @@ export default StyleSheet.create({
   },
 
   targetName: {
+    fontFamily: "GameFont",
     color: Colors.textPrimary,
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: "800",
     opacity: 0.8,
   },

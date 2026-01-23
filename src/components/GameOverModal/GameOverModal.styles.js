@@ -18,6 +18,7 @@ export default StyleSheet.create({
 
   /* RESULT */
   resultText: {
+    fontFamily: "GameFont",
     fontSize: 28,
     fontWeight: "900",
     marginBottom: 12,
@@ -38,12 +39,14 @@ export default StyleSheet.create({
   },
 
   scoreLabel: {
+    fontFamily: "GameFont",
     fontSize: 15,
     color: "#9ca3af",
   },
 
   scoreValue: {
-    fontSize: 42,
+    fontFamily: "FeedbackFont",
+    fontSize: 48,
     fontWeight: "900",
     color: "#f9fafb",
     marginTop: 4,
@@ -60,11 +63,13 @@ export default StyleSheet.create({
   },
 
   rewardLabel: {
+    fontFamily: "GameFont",
     fontSize: 14,
     color: "#9ca3af",
   },
 
   rewardValue: {
+    fontFamily: "GameFont",
     fontSize: 22,
     fontWeight: "800",
     color: "#facc15",
@@ -73,6 +78,7 @@ export default StyleSheet.create({
 
   /* HIGH SCORE */
   highScoreText: {
+    fontFamily: "GameFont",
     fontSize: 14,
     color: "#60a5fa",
     marginTop: 10,
@@ -101,6 +107,7 @@ export default StyleSheet.create({
 
   buttonText: {
     color: "#f9fafb",
+    fontFamily: "GameFont",
     fontSize: 16,
     fontWeight: "700",
   },

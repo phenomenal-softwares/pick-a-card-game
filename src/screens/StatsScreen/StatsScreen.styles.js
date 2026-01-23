@@ -16,6 +16,7 @@ export default StyleSheet.create({
   },
 
   sectionTitle: {
+    fontFamily: "GameFont",
     fontSize: 18,
     fontWeight: "700",
     color: Colors.strawberrySoft,
@@ -31,11 +32,13 @@ export default StyleSheet.create({
   },
 
   label: {
+    fontFamily: "GameFont",
     fontSize: 14,
     color: Colors.strawberrySoft,
   },
 
   value: {
+    fontFamily: "GameFont",
     fontSize: 15,
     fontWeight: "600",
     color: "#f9fafb",

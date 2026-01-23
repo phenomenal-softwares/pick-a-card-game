@@ -70,6 +70,7 @@ export default StyleSheet.create({
   },
 
   statText: {
+    fontFamily: "GameFont",
     fontSize: 13,
     fontWeight: "600",
     color: Colors.white,
@@ -113,6 +114,7 @@ export default StyleSheet.create({
   },
 
   tileText: {
+    fontFamily: "GameFont",
     marginTop: 10,
     fontSize: 15,
     fontWeight: "600",

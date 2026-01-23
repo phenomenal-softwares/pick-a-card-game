@@ -13,6 +13,7 @@ export default StyleSheet.create({
   },
 
   sectionTitle: {
+    fontFamily: "GameFont",
     color: Colors.strawberrySoft,
     fontSize: 15,
     marginBottom: 10,
@@ -40,6 +41,7 @@ export default StyleSheet.create({
   },
 
   optionText: {
+    fontFamily: "GameFont",
     color: Colors.textOnColor,
     fontSize: 15,
     fontWeight: "600",
@@ -64,6 +66,7 @@ export default StyleSheet.create({
   },
 
   deleteText: {
+    fontFamily: "GameFont",
     color: "#fee2e2",
     fontSize: 16,
     fontWeight: "700",

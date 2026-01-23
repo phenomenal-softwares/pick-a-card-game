@@ -34,12 +34,14 @@ export default StyleSheet.create({
   },
 
   label: {
+    fontFamily: "GameFont",
     fontSize: 15,
     color: Colors.textOnColor,
     fontWeight: "500",
   },
 
   footer: {
+    fontFamily: "GameFont",
     marginTop: 50,
     textAlign: "center",
     fontSize: 12,

@@ -44,6 +44,7 @@ export default function SettingsScreen() {
 
   /* ---------- HANDLE DELETE DATA ---------- */
   const confirmDeleteData = async () => {
+    navigation.goBack();
     setShowDeleteConfirm(false);
     await hardReset();
   };

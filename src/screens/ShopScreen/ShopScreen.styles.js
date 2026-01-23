@@ -57,12 +57,14 @@ export default StyleSheet.create({
 
   name: {
     color: "#f9fafb",
+    fontFamily: "GameFont",
     fontSize: 16,
     fontWeight: "800",
     marginBottom: 2,
   },
 
   description: {
+    fontFamily: "GameFont",
     color: Colors.strawberrySoft,
     fontSize: 13,
     lineHeight: 18,
@@ -76,6 +78,7 @@ export default StyleSheet.create({
   },
 
   count: {
+    fontFamily: "GameFont",
     color: Colors.textPrimary,
     fontSize: 13,
   },
@@ -87,6 +90,7 @@ export default StyleSheet.create({
 
   price: {
     color: Colors.coin,
+    fontFamily: "GameFont",
     fontSize: 14,
     fontWeight: "700",
   },
@@ -104,6 +108,7 @@ export default StyleSheet.create({
   },
 
   buyText: {
+    fontFamily: "GameFont",
     color: Colors.textSecondary,
     fontWeight: "800",
     fontSize: 14,
