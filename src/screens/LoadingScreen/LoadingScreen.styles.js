@@ -80,15 +80,28 @@ export default StyleSheet.create({
     textTransform: "uppercase",
   },
 
-  /* -------------------------------
-     OPTIONAL FOOTER TEXT
-     (use later if needed)
-  -------------------------------- */
-  footerHint: {
-    position: "absolute",
-    bottom: 24,
-    fontSize: 11,
-    color: Colors.textMuted,
-    opacity: 0.85,
+  // BLOCKED FOR DESKTOPS SCREENS
+  blockedContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: Colors.strawberryDark,
+    gap: 8,
   },
+
+  blockedTitle: {
+    fontSize: 24,
+    color: Colors.textOnColor,
+    fontWeight: "bold"
+  },
+
+  blockedText: {
+    fontSize: 16,
+    color: Colors.textOnColor,
+  },
+
+  blockedHint: {
+    fontSize: 14,
+    color: Colors.strawberryLight,
+  }
 });
